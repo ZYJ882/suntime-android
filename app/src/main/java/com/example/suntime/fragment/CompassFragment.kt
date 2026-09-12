@@ -120,8 +120,8 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     private fun showLocation(loc: Location) {
-        binding.tvLat.text = "纬度：${String.format(Locale.CHINA, "%.5f", loc.latitude)}°"
-        binding.tvLng.text = "经度：${String.format(Locale.CHINA, "%.5f", loc.longitude)}°"
+        binding.tvLat.text = String.format(Locale.CHINA, "%.5f", loc.latitude)
+        binding.tvLng.text = String.format(Locale.CHINA, "%.5f", loc.longitude)
         // 反查地址（需网络）
         try {
             val geocoder = Geocoder(requireContext(), Locale.CHINA)

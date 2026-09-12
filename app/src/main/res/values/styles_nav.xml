@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- M3 风格浅色选中容器（圆角胶囊） -->
+    <style name="Suntime.NavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/primary_container</item>
+        <item name="android:width">58dp</item>
+        <item name="android:height">30dp</item>
+    </style>
+</resources>

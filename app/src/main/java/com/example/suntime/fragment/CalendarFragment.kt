@@ -125,8 +125,8 @@ class CalendarFragment : Fragment() {
         binding.tvLunar.text = LunarCalendar.lunarString(l)
         val termLine = if (l.term != null) " · ${l.term}" else ""
         binding.tvGanZhi.text = "干支：${l.ganzhiYear}年 ${l.ganzhiMonth}月 ${l.ganzhiDay}日 · ${l.zodiac}年 · ${l.constellation}$termLine"
-        binding.tvYi.text = "宜：${l.yi}"
-        binding.tvJi.text = "忌：${l.ji}"
+        binding.tvYi.text = l.yi
+        binding.tvJi.text = l.ji
     }
 
     private fun pickDate(onPick: (Int, Int, Int) -> Unit) {

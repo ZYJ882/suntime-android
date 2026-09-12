@@ -16,6 +16,7 @@ import com.example.suntime.adapter.WorldClockAdapter
 import com.example.suntime.databinding.FragmentClockBinding
 import com.example.suntime.util.CityData
 import com.example.suntime.util.DateCalc
+import com.example.suntime.view.LightDividerDecoration
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -58,6 +59,7 @@ class ClockFragment : Fragment() {
         }
         binding.rvWorldClock.layoutManager = LinearLayoutManager(requireContext())
         binding.rvWorldClock.adapter = adapter
+        binding.rvWorldClock.addItemDecoration(LightDividerDecoration(requireContext()))
 
         binding.etCitySearch.addTextChangedListener { adapter.setKeyword(it?.toString() ?: "") }
 

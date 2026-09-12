@@ -51,6 +51,42 @@ Suntime/
             └── values/ (strings / colors / themes)
 ```
 
+## 设计系统（Material 3 / Material You）
+
+本次 UI 重构统一了三个页面的视觉语言，功能、数据逻辑、交互逻辑保持不变。
+
+**颜色（浅色 / 深色双套，非简单反转）**
+
+| Token | 浅色 | 深色 |
+|------|------|------|
+| Primary | `#1976D2` | `#7FB2E8` |
+| Background | `#F7F8FA` | `#14161A` |
+| Surface | `#FFFFFF` | `#1C1F24` |
+| Primary Text | `#202124` | `#E6E8EB` |
+| Secondary Text | `#6F7378` | `#A4A9B0` |
+| Divider | `#E5E7EB` | `#2C3037` |
+
+**统一规范（`res/values/dimens.xml`）**
+
+- 页面水平边距统一 `16dp`；间距梯度 `4 / 8 / 12 / 16 / 24dp`
+- 圆角统一：小 `10dp`、中 `16dp`、大 `20dp`
+- 阴影克制：卡片 `elevation=0dp` + `1dp` 描边，替代堆叠阴影
+- 字体层级：主标题 `20sp` / 条目 `16sp` / 次级 `12sp` / 主读数 `40–56sp`
+- 图标统一 `24dp` vector，tint 走主题，深色自动适配
+- 状态栏 / 导航栏透明并随主题明暗切换
+
+**三页改动要点**
+
+| 页面 | 主要变化 |
+|------|----------|
+| **底部导航** | 高度降至 `58dp`，选中态改用 M3 浅色胶囊容器（`primary_container`），未选中降低权重 |
+| **时钟** | 本地时间作为视觉核心（`56sp` 细体）；日期/星期降为次级；世界时钟改轻量列表 + 细分割线（不再一城一卡）；搜索框轻量化；工具区去卡片化 |
+| **日历** | 「2026年9月」保持单行；月份切换用图标按钮 + 紧凑「今天」；网格为核心、去外围卡片；选中态改 M3 圆形（Primary 实心 / 今天浅色圆）；公历-农历层级清晰；宜忌改轻量信息区（标签为主色、内容中性，无大面积红绿）；工具区轻量分组 |
+| **指南针** | 删除大面积纯蓝圆盘，改浅色底 + 白/浅灰表盘；刻度环 + 方位文字（N/E/S/W 为主、NE 等弱化）；北针 Primary 蓝、南针红色；表盘静止、仅指针旋转；顶部红色指向标记；经纬度改轻量数据区；定位按钮降高 |
+
+> 新增文件：`values/dimens.xml`、`values-night/colors.xml`、`color/nav_item.xml`、
+> `values/styles_nav.xml`、`drawable/bg_*.xml`、`view/LightDividerDecoration.kt`。
+
 ## 如何运行
 
 1. 用 **Android Studio（Hedgehog 或更新版本，内置 JDK 17）** 打开本工程根目录。

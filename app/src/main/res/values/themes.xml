@@ -1,11 +1,115 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- 使用 Material Components 主题，避免 Material3 属性兼容问题 -->
-    <style name="Theme.Suntime" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <!--
+      统一设计系统：Material 3 (DayNight)
+      - 页面背景 / 表面 / 文字 / 线条 全部走 design token
+      - 支持 浅色 / 深色 / 跟随系统
+      - 状态栏与导航栏透明并跟随主题，保证三页视觉一致
+    -->
+    <style name="Theme.Suntime" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 品牌色 -->
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+
+        <!-- 表面 / 背景 -->
         <item name="android:colorBackground">@color/bg</item>
-        <item name="colorSurface">@color/card</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/divider</item>
+
+        <!-- 次要 / 强调 -->
+        <item name="colorSecondary">@color/primary</item>
+        <item name="colorSecondaryContainer">@color/primary_container</item>
+
+        <!-- 窗口 -->
         <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+
+        <!-- 控件默认圆角与高度统一 -->
+        <item name="materialButtonStyle">@style/Widget.Suntime.Button</item>
+        <item name="materialButtonOutlinedStyle">@style/Widget.Suntime.Button.Outlined</item>
+    </style>
+
+    <!-- ===== 统一按钮：低视觉重量 ===== -->
+    <style name="Widget.Suntime.Button" parent="Widget.Material3.Button">
+        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="rippleColor">@color/primary_container</item>
+    </style>
+
+    <style name="Widget.Suntime.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="iconTint">@color/primary</item>
+    </style>
+
+    <!-- 轻量文本按钮（工具行） -->
+    <style name="Widget.Suntime.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="cornerRadius">@dimen/radius_sm</item>
+    </style>
+
+    <!-- 圆形图标按钮（月切换 / 今天） -->
+    <style name="Widget.Suntime.Button.Icon" parent="Widget.Material3.Button.IconButton">
+        <item name="android:minWidth">40dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="iconTint">@color/text_secondary</item>
+        <item name="iconSize">22dp</item>
+    </style>
+
+    <!-- ===== 统一卡片：极克制阴影 ===== -->
+    <style name="Widget.Suntime.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/radius_md</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="strokeColor">@color/divider</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- 轻量分组容器：无边框、仅背景区分 -->
+    <style name="Widget.Suntime.Card.Flat" parent="Widget.Suntime.Card">
+        <item name="strokeWidth">0dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+    </style>
+
+    <!-- ===== 文本样式 ===== -->
+    <style name="Text.Suntime.Section" parent="">
+        <item name="android:textSize">@dimen/text_section</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <style name="Text.Suntime.Title" parent="">
+        <item name="android:textSize">@dimen/text_item_title</item>
+        <item name="android:textColor">@color/text_primary</item>
+    </style>
+
+    <style name="Text.Suntime.Sub" parent="">
+        <item name="android:textSize">@dimen/text_item_sub</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <!-- 轻分割线 -->
+    <style name="Divider.Suntime" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/divider</item>
     </style>
 </resources>

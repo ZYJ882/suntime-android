@@ -1,16 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- ===== 基础 ===== -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="grey">#FF9E9E9E</color>
+    <color name="transparent">#00000000</color>
 
-    <color name="primary">#1565C0</color>
-    <color name="primary_dark">#0D3B66</color>
-    <color name="accent">#FF8F00</color>
-    <color name="bg">#F5F6FA</color>
-    <color name="card">#FFFFFFFF</color>
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
-    <color name="red">#E53935</color>
-    <color name="green">#2E7D32</color>
+    <!-- ===== 品牌色（浅色模式）===== -->
+    <color name="primary">#1976D2</color>
+    <color name="on_primary">#FFFFFFFF</color>
+    <color name="primary_container">#E3F0FC</color>
+    <color name="on_primary_container">#0F4C91</color>
+
+    <!-- ===== 背景 / 表面（浅色模式）===== -->
+    <color name="bg">#F7F8FA</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_variant">#F1F3F5</color>
+
+    <!-- ===== 文字 ===== -->
+    <color name="text_primary">#202124</color>
+    <color name="text_secondary">#6F7378</color>
+    <color name="text_tertiary">#9AA0A6</color>
+
+    <!-- ===== 线条 ===== -->
+    <color name="divider">#E5E7EB</color>
+    <color name="outline">#DADCE0</color>
+
+    <!-- ===== 功能色（克制使用）===== -->
+    <color name="red">#D93B3B</color>
+    <color name="green">#2E7D4F</color>
+    <color name="star">#E0A43C</color>
+
+    <!-- ===== 指南针表盘（浅色）===== -->
+    <color name="compass_dial">#FFFFFF</color>
+    <color name="compass_ring">#E3E6EA</color>
+    <color name="compass_tick">#C4C9CF</color>
+    <color name="compass_tick_major">#9AA0A6</color>
+    <color name="compass_label">#5F6368</color>
+    <color name="compass_cardinal">#202124</color>
+    <color name="compass_needle_n">#D93B3B</color>
+    <color name="compass_needle_s">#1976D2</color>
+    <color name="compass_center">#FFFFFF</color>
+    <color name="compass_center_ring">#1976D2</color>
 </resources>

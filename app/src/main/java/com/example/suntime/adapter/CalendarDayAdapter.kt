@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.suntime.R
 import com.example.suntime.util.LunarCalendar
@@ -29,6 +30,7 @@ class CalendarDayAdapter(
     }
 
     class VH(v: View) : RecyclerView.ViewHolder(v) {
+        val bg: View = v.findViewById(R.id.tvDayBg)
         val num: TextView = v.findViewById(R.id.tvDayNum)
         val lunar: TextView = v.findViewById(R.id.tvLunarNum)
     }
@@ -41,26 +43,47 @@ class CalendarDayAdapter(
     override fun getItemCount() = cells.size
 
     override fun onBindViewHolder(holder: VH, position: Int) {
+        val ctx = holder.itemView.context
         val c = cells[position]
         val l = LunarCalendar.solarToLunar(c.year, c.month, c.day)
         holder.num.text = c.day.toString()
         holder.lunar.text = l.term ?: l.dayCn
 
-        val color = when {
-            c.isSelected -> android.graphics.Color.WHITE
-            !c.inMonth -> android.graphics.Color.LTGRAY
-            else -> android.graphics.Color.BLACK
-        }
-        holder.num.setTextColor(color)
-        holder.lunar.setTextColor(if (c.isSelected) android.graphics.Color.WHITE else android.graphics.Color.GRAY)
+        val onPrimary = ContextCompat.getColor(ctx, R.color.on_primary)
+        val textPrimary = ContextCompat.getColor(ctx, R.color.text_primary)
+        val textTertiary = ContextCompat.getColor(ctx, R.color.text_tertiary)
+        val primary = ContextCompat.getColor(ctx, R.color.primary)
 
-        // 背景
-        val bg = when {
-            c.isSelected -> android.graphics.Color.parseColor("#1565C0")
-            c.isToday -> android.graphics.Color.parseColor("#E3F2FD")
-            else -> android.graphics.Color.TRANSPARENT
+        // 数字颜色：选中 -> onPrimary；非本月 -> 弱化；节日 -> Primary
+        holder.num.setTextColor(
+            when {
+                c.isSelected -> onPrimary
+                !c.inMonth -> textTertiary
+                else -> textPrimary
+            }
+        )
+        // 农历小字：选中 -> 半透明白；节气 -> Primary；其余弱化
+        holder.lunar.setTextColor(
+            when {
+                c.isSelected -> onPrimary
+                l.term != null -> primary
+                else -> textTertiary
+            }
+        )
+        holder.lunar.alpha = if (c.isSelected) 0.85f else 1f
+
+        // 背景：选中 -> 实心圆（Primary）；今天 -> 浅色圆（primary_container）；其余无
+        when {
+            c.isSelected -> {
+                holder.bg.setBackgroundResource(R.drawable.bg_day_circle)
+                holder.bg.visibility = View.VISIBLE
+            }
+            c.isToday -> {
+                holder.bg.setBackgroundResource(R.drawable.bg_day_today)
+                holder.bg.visibility = View.VISIBLE
+            }
+            else -> holder.bg.visibility = View.INVISIBLE
         }
-        holder.itemView.setBackgroundColor(bg)
 
         holder.itemView.setOnClickListener { onPick(c) }
     }
