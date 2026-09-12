@@ -1,0 +1,10 @@
+# Local Gradle and Android build outputs
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+
+# Local machine files
+*.log
