@@ -19,7 +19,8 @@ class WorldClockAdapter(
 ) : RecyclerView.Adapter<WorldClockAdapter.VH>() {
 
     private var keyword = ""
-    private val timeFmt = SimpleDateFormat("HH:mm:ss", Locale.CHINA)
+    // 世界时钟不显示秒，避免视觉跳动
+    private val timeFmt = SimpleDateFormat("HH:mm", Locale.CHINA)
 
     fun setKeyword(k: String) {
         keyword = k.trim()
@@ -63,17 +64,28 @@ class WorldClockAdapter(
         val now = System.currentTimeMillis()
         val cal = Calendar.getInstance(zone).apply { timeInMillis = now }
         timeFmt.timeZone = zone
+        val cityOffset = zone.getOffset(now)
 
         holder.tvCity.text = city.name
-        holder.tvZone.text = "${city.country} · ${city.zoneId} · ${zone.getDisplayName(false, TimeZone.SHORT, Locale.CHINA)}"
+        // 二级信息精简：只保留 国家 · GMT+8，不再堆 zoneId 全串
+        holder.tvZone.text = "${city.country} · ${gmtLabel(cityOffset)}"
         holder.tvTime.text = timeFmt.format(cal.time)
 
         val localOffset = TimeZone.getDefault().getOffset(now)
-        val cityOffset = zone.getOffset(now)
         val diffH = (cityOffset - localOffset) / 3600000f
         holder.tvOffset.text = if (diffH == 0f) "与本地相同" else "本地${if (diffH > 0) "+" else ""}$diffH 小时"
 
         holder.tvStar.text = if (favorites.contains(city.zoneId)) "★" else "☆"
         holder.tvStar.setOnClickListener { onToggleFavorite(city) }
+    }
+
+    /** 将毫秒偏移格式化为 GMT+8 / GMT+5:30 / GMT-4 形式 */
+    private fun gmtLabel(offsetMs: Int): String {
+        val totalMin = offsetMs / 60000
+        val sign = if (totalMin >= 0) "+" else "-"
+        val absMin = kotlin.math.abs(totalMin)
+        val h = absMin / 60
+        val m = absMin % 60
+        return if (m == 0) "GMT$sign$h" else "GMT$sign$h:${"%02d".format(m)}"
     }
 }

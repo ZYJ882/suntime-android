@@ -39,7 +39,7 @@
 
     <!-- ===== 统一按钮：低视觉重量 ===== -->
     <style name="Widget.Suntime.Button" parent="Widget.Material3.Button">
-        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="android:minHeight">44dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.01</item>
@@ -48,7 +48,7 @@
     </style>
 
     <style name="Widget.Suntime.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="android:minHeight">44dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
@@ -62,7 +62,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/primary</item>
-        <item name="cornerRadius">@dimen/radius_sm</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
     </style>
 
     <!-- 圆形图标按钮（月切换 / 今天） -->

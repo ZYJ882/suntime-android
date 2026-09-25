@@ -1,35 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== 统一间距规范（所有页面共用）===== -->
-    <dimen name="space_xs">4dp</dimen>
-    <dimen name="space_sm">8dp</dimen>
-    <dimen name="space_md">12dp</dimen>
-    <dimen name="space_lg">16dp</dimen>
-    <dimen name="space_xl">24dp</dimen>
+    <!-- ===== 4dp 间距体系（禁止 17/19/23 等随意值）===== -->
+    <dimen name="space_4">4dp</dimen>
+    <dimen name="space_8">8dp</dimen>
+    <dimen name="space_12">12dp</dimen>
+    <dimen name="space_16">16dp</dimen>
+    <dimen name="space_20">20dp</dimen>
+    <dimen name="space_24">24dp</dimen>
+    <dimen name="space_32">32dp</dimen>
+
+    <!-- ===== 层级化圆角 ===== -->
+    <dimen name="radius_container">24dp</dimen>   <!-- 大容器 -->
+    <dimen name="radius_card">20dp</dimen>        <!-- 普通卡片 / 分组 -->
+    <dimen name="radius_search">16dp</dimen>      <!-- 搜索框 -->
+    <dimen name="radius_button">14dp</dimen>      <!-- 按钮 -->
+    <dimen name="radius_tag">10dp</dimen>         <!-- 小标签 / 输入 -->
 
     <!-- 页面统一水平边距 -->
     <dimen name="page_padding_h">16dp</dimen>
     <dimen name="page_padding_top">8dp</dimen>
 
-    <!-- 统一圆角 -->
-    <dimen name="radius_sm">10dp</dimen>
-    <dimen name="radius_md">16dp</dimen>
-    <dimen name="radius_lg">20dp</dimen>
-    <dimen name="radius_pill">999dp</dimen>
-
-    <!-- 统一字阶 -->
+    <!-- ===== 字阶 ===== -->
     <dimen name="text_page_title">20sp</dimen>
     <dimen name="text_section">14sp</dimen>
     <dimen name="text_item_title">16sp</dimen>
     <dimen name="text_item_sub">12sp</dimen>
-    <dimen name="text_caption">12sp</dimen>
     <dimen name="text_hero_time">56sp</dimen>
     <dimen name="text_reading">40sp</dimen>
+    <dimen name="text_day_big">56sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
 
-    <!-- 底栏 -->
+    <!-- ===== 组件尺寸 ===== -->
     <dimen name="bottom_nav_height">58dp</dimen>
-
-    <!-- 指南针 -->
+    <dimen name="search_height">48dp</dimen>
+    <dimen name="input_height">44dp</dimen>
+    <dimen name="button_height">44dp</dimen>
     <dimen name="compass_size">272dp</dimen>
-    <dimen name="calendar_cell_height">46dp</dimen>
+    <dimen name="calendar_cell_height">48dp</dimen>
+    <dimen name="calendar_dot">40dp</dimen>
+
+    <!-- 兼容旧引用 -->
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_sm">8dp</dimen>
+    <dimen name="space_md">12dp</dimen>
+    <dimen name="space_lg">16dp</dimen>
+    <dimen name="space_xl">24dp</dimen>
+    <dimen name="radius_sm">14dp</dimen>
+    <dimen name="radius_md">20dp</dimen>
+    <dimen name="radius_lg">24dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
 </resources>

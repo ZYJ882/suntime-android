@@ -120,11 +120,20 @@ class CalendarFragment : Fragment() {
 
     private fun updateDetail() {
         val l = LunarCalendar.solarToLunar(selYear, selMonth, selDay)
-        binding.tvCalWeekday.text = l.weekday
-        binding.tvGregorian.text = String.format("%d-%02d-%02d", selYear, selMonth, selDay)
-        binding.tvLunar.text = LunarCalendar.lunarString(l)
-        val termLine = if (l.term != null) " · ${l.term}" else ""
-        binding.tvGanZhi.text = "干支：${l.ganzhiYear}年 ${l.ganzhiMonth}月 ${l.ganzhiDay}日 · ${l.zodiac}年 · ${l.constellation}$termLine"
+
+        // 主信息：大号日期数字（视觉中心）
+        binding.tvDayBig.text = selDay.toString()
+
+        // 次信息：公历全称
+        binding.tvGregorian.text = String.format("%d年%d月%d日", selYear, selMonth, selDay)
+
+        // 次信息：农历 · 星期（合并为一行，避免过宽）
+        val termPart = if (l.term != null) " · ${l.term}" else ""
+        binding.tvLunarLine.text = "农历${l.monthCn}月${l.dayCn} · 星期${l.weekday}$termPart"
+
+        // 辅助信息：干支 / 生肖 / 星座
+        binding.tvGanZhi.text = "${l.ganzhiYear}年 · ${l.ganzhiMonth}月 · ${l.ganzhiDay}日 · ${l.zodiac}年 · ${l.constellation}"
+
         binding.tvYi.text = l.yi
         binding.tvJi.text = l.ji
     }

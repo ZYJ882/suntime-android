@@ -4,39 +4,44 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:minHeight="56dp">
+    android:minHeight="52dp">
 
+    <!-- 星标：比城市名小，不抢视觉 -->
     <TextView
         android:id="@+id/tvStar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:gravity="center"
         android:text="☆"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:textColor="@color/star" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="@dimen/space_xs"
+        android:layout_marginStart="@dimen/space_8"
         android:orientation="vertical">
 
+        <!-- 一级：城市名 -->
         <TextView
             android:id="@+id/tvCity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <!-- 二级：国家 · GMT+8 -->
         <TextView
             android:id="@+id/tvZone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="2dp"
+            android:includeFontPadding="false"
             android:textColor="@color/text_tertiary"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
@@ -47,21 +52,25 @@
         android:gravity="end"
         android:orientation="vertical">
 
+        <!-- 一级：时间（不显示秒） -->
         <TextView
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="-0.01" />
 
+        <!-- 二级：与本地时差 -->
         <TextView
             android:id="@+id/tvOffset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="2dp"
+            android:includeFontPadding="false"
             android:textColor="@color/text_tertiary"
-            android:textSize="12sp" />
+            android:textSize="11sp" />
     </LinearLayout>
 </LinearLayout>

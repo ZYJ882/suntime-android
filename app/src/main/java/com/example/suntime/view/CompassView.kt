@@ -87,29 +87,30 @@ class CompassView @JvmOverloads constructor(
             )
         }
 
-        // 5. 方位文字（固定不动：表盘静止，仅指针旋转，读数指向顶部三角）
+        // 5. 方位文字（固定不动：表盘静止，仅指针旋转）
+        //    主方向 N/E/S/W 稍大；斜方向 NE/SE/SW/NW 明显小一级
         paint.textAlign = Paint.Align.CENTER
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        paint.textSize = r * 0.17f
+        paint.textSize = r * 0.135f
 
         val cardinals = mapOf("N" to 0, "E" to 90, "S" to 180, "W" to 270)
         for ((label, deg) in cardinals) {
             val rad = Math.toRadians(deg.toDouble())
-            val rr = r * 0.66f
+            val rr = r * 0.64f
             val tx = cx + (rr * sin(rad)).toFloat()
             val ty = cy - (rr * cos(rad)).toFloat() + paint.textSize * 0.35f
             paint.color = if (label == "N") cNeedleN else cCardinal
             canvas.drawText(label, tx, ty, paint)
         }
 
-        // 次级方位（弱化）
+        // 次级方位（明显弱化，小一级）
         paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        paint.textSize = r * 0.085f
+        paint.textSize = r * 0.068f
         paint.color = cLabel
         val minors = mapOf("NE" to 45, "SE" to 135, "SW" to 225, "NW" to 315)
         for ((label, deg) in minors) {
             val rad = Math.toRadians(deg.toDouble())
-            val rr = r * 0.66f
+            val rr = r * 0.64f
             val tx = cx + (rr * sin(rad)).toFloat()
             val ty = cy - (rr * cos(rad)).toFloat() + paint.textSize * 0.35f
             canvas.drawText(label, tx, ty, paint)
@@ -127,26 +128,31 @@ class CompassView @JvmOverloads constructor(
         paint.color = cNeedleN
         path.reset()
         path.moveTo(cx, cy - r + 5f)
-        path.lineTo(cx - 7f, cy - r + 15f)
-        path.lineTo(cx + 7f, cy - r + 15f)
+        path.lineTo(cx - 6f, cy - r + 14f)
+        path.lineTo(cx + 6f, cy - r + 14f)
         path.close()
         canvas.drawPath(path, paint)
 
-        // 7. 中心圆点
+        // 8. 中心圆：外圈淡环 + 内圈实心，更像真实仪表盘
+        val centerR = r * 0.062f
         paint.style = Paint.Style.FILL
         paint.color = cCenter
-        canvas.drawCircle(cx, cy, r * 0.072f, paint)
+        canvas.drawCircle(cx, cy, centerR, paint)
+        // 淡内圈
         paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 1f
+        paint.color = cTick
+        canvas.drawCircle(cx, cy, centerR * 0.55f, paint)
         paint.strokeWidth = 1.5f
         paint.color = cCenterRing
-        canvas.drawCircle(cx, cy, r * 0.072f, paint)
+        canvas.drawCircle(cx, cy, centerR, paint)
     }
 
-    /** 指针：从中心到指定方向的细长三角 */
+    /** 指针：从中心到指定方向的细长三角（已收细约 27%） */
     private fun drawNeedle(canvas: Canvas, cx: Float, cy: Float, r: Float, isNorth: Boolean, color: Int) {
         val tipR = r * 0.70f
         val baseR = r * 0.10f
-        val halfW = r * 0.055f
+        val halfW = r * 0.040f   // 原 0.055f，收细约 27%
         val dir = if (isNorth) -1f else 1f   // 北：向上；南：向下
 
         val tipY = cy + dir * tipR
