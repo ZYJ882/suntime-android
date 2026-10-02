@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- 底栏选中 / 未选中 颜色（浅深色自动切换） -->
-    <color name="nav_item_color">@color/nav_item</color>
-</resources>

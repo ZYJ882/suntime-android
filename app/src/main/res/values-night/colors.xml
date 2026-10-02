@@ -20,10 +20,10 @@
     <color name="divider">#2C3037</color>
     <color name="outline">#3A3F46</color>
 
-    <!-- ===== 功能色 ===== -->
+    <!-- ===== 功能色（严格收敛：仅 蓝 / 红 / 绿 三色，与浅色一致）===== -->
     <color name="red">#EF7B7B</color>
     <color name="green">#6FBF8E</color>
-    <color name="star">#E0B45C</color>
+    <color name="star">#7FB2E8</color>
 
     <!-- ===== 指南针表盘（深色）===== -->
     <color name="compass_dial">#1C1F24</color>

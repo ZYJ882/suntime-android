@@ -5,7 +5,9 @@
       - 支持 浅色 / 深色 / 跟随系统
       - 状态栏与导航栏透明并跟随主题，保证三页视觉一致
     -->
-    <style name="Theme.Suntime" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- 设计系统基座：所有 color token / 组件样式统一在此定义，
+         浅色与深色共用，避免双份配置漂移 -->
+    <style name="Theme.Suntime.Base" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- 品牌色 -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
@@ -29,12 +31,16 @@
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
 
         <!-- 控件默认圆角与高度统一 -->
         <item name="materialButtonStyle">@style/Widget.Suntime.Button</item>
         <item name="materialButtonOutlinedStyle">@style/Widget.Suntime.Button.Outlined</item>
+    </style>
+
+    <!-- 浅色：状态栏 / 导航栏用深色字（背景为浅色） -->
+    <style name="Theme.Suntime" parent="Theme.Suntime.Base">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 
     <!-- ===== 统一按钮：低视觉重量 ===== -->

@@ -6,8 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.suntime.R
 import com.example.suntime.adapter.CalendarDayAdapter
 import com.example.suntime.adapter.DayCell
 import com.example.suntime.databinding.FragmentCalendarBinding
@@ -127,9 +132,20 @@ class CalendarFragment : Fragment() {
         // 次信息：公历全称
         binding.tvGregorian.text = String.format("%d年%d月%d日", selYear, selMonth, selDay)
 
-        // 次信息：农历 · 星期（合并为一行，避免过宽）
-        val termPart = if (l.term != null) " · ${l.term}" else ""
-        binding.tvLunarLine.text = "农历${l.monthCn}月${l.dayCn} · 星期${l.weekday}$termPart"
+        // 次信息：农历 · 星期（合并为一行，避免过宽）；节气用品牌蓝突出
+        val base = "农历${l.monthCn}月${l.dayCn} · 星期${l.weekday}"
+        if (l.term != null) {
+            val full = "$base · ${l.term}"
+            val sp = SpannableString(full)
+            sp.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.primary)),
+                base.length + 3, full.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            binding.tvLunarLine.text = sp
+        } else {
+            binding.tvLunarLine.text = base
+        }
 
         // 辅助信息：干支 / 生肖 / 星座
         binding.tvGanZhi.text = "${l.ganzhiYear}年 · ${l.ganzhiMonth}月 · ${l.ganzhiDay}日 · ${l.zodiac}年 · ${l.constellation}"
