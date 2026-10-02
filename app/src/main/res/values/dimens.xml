@@ -20,15 +20,23 @@
     <dimen name="page_padding_h">16dp</dimen>
     <dimen name="page_padding_top">8dp</dimen>
 
-    <!-- ===== 字阶 ===== -->
-    <dimen name="text_page_title">20sp</dimen>
-    <dimen name="text_section">14sp</dimen>
-    <dimen name="text_item_title">16sp</dimen>
-    <dimen name="text_item_sub">12sp</dimen>
-    <dimen name="text_hero_time">56sp</dimen>
-    <dimen name="text_reading">40sp</dimen>
-    <dimen name="text_day_big">56sp</dimen>
-    <dimen name="text_caption">12sp</dimen>
+    <!-- ===== 字阶（统一三页，消除散落 sp）===== -->
+    <dimen name="text_display">56sp</dimen>     <!-- 主视觉大数字 / 本地时间 -->
+    <dimen name="text_reading">40sp</dimen>     <!-- 指南针核心读数 -->
+    <dimen name="text_title">20sp</dimen>       <!-- 页面标题（月份） -->
+    <dimen name="text_subtitle">17sp</dimen>    <!-- 次级标题：公历全称 -->
+    <dimen name="text_value">18sp</dimen>       <!-- 强调数值：经纬度 -->
+    <dimen name="text_body_lg">16sp</dimen>     <!-- 列表主文字：城市名 / 时间 / 日期 -->
+    <dimen name="text_body">15sp</dimen>        <!-- 结果 / 次要正文 -->
+    <dimen name="text_body_sm">14sp</dimen>     <!-- 输入框 / 提示 / 方向 -->
+    <dimen name="text_caption">13sp</dimen>     <!-- 干支 / 星标 -->
+    <dimen name="text_micro">12sp</dimen>       <!-- 星期表头 / 小字 -->
+    <dimen name="text_tiny">11sp</dimen>        <!-- 列表二级：国家·GMT / 时差 -->
+    <dimen name="text_week">10sp</dimen>        <!-- 日历农历角标 -->
+    <!-- 样式基准（供 Text.* 复用） -->
+    <dimen name="text_section">14sp</dimen>     <!-- 眉标：本地时间 / 当前位置 -->
+    <dimen name="text_item_title">16sp</dimen>  <!-- 卡片标题基准 -->
+    <dimen name="text_item_sub">12sp</dimen>    <!-- 次级正文基准 -->
 
     <!-- ===== 组件尺寸 ===== -->
     <dimen name="bottom_nav_height">58dp</dimen>
@@ -38,6 +46,12 @@
     <dimen name="compass_size">272dp</dimen>
     <dimen name="calendar_cell_height">48dp</dimen>
     <dimen name="calendar_dot">40dp</dimen>
+    <dimen name="icon_button_size">40dp</dimen>
+    <dimen name="row_min_height">52dp</dimen>
+    <dimen name="chip_height">36dp</dimen>
+    <dimen name="icon_search">18dp</dimen>
+    <dimen name="star_size">24dp</dimen>
+    <dimen name="button_min_width">72dp</dimen>
 
     <!-- 兼容旧引用 -->
     <dimen name="space_xs">4dp</dimen>

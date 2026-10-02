@@ -27,8 +27,8 @@
             <ImageButton
                 android:id="@+id/btnPrevMonth"
                 style="@style/Widget.Suntime.Button.Icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="上个月"
                 android:scaleType="centerInside"
@@ -44,14 +44,14 @@
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_page_title"
+                android:textSize="@dimen/text_title"
                 android:textStyle="bold" />
 
             <ImageButton
                 android:id="@+id/btnNextMonth"
                 style="@style/Widget.Suntime.Button.Icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="下个月"
                 android:scaleType="centerInside"
@@ -61,7 +61,7 @@
             <TextView
                 android:id="@+id/btnToday"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="@dimen/chip_height"
                 android:layout_marginStart="@dimen/space_8"
                 android:background="@drawable/bg_search"
                 android:gravity="center"
@@ -69,7 +69,7 @@
                 android:paddingEnd="@dimen/space_12"
                 android:text="今天"
                 android:textColor="@color/primary"
-                android:textSize="14sp" />
+                android:textSize="@dimen/text_body_sm" />
         </LinearLayout>
 
         <!-- ============ 日历网格（页面核心）============ -->
@@ -85,13 +85,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/text_tertiary" android:textSize="12sp" />
-                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="@color/text_tertiary" android:textSize="12sp" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -125,7 +125,7 @@
                 android:layout_marginTop="@dimen/space_20"
                 android:includeFontPadding="false"
                 android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_day_big"
+                android:textSize="@dimen/text_display"
                 android:fontFamily="sans-serif-light"
                 android:letterSpacing="-0.03" />
 
@@ -137,7 +137,7 @@
                 android:layout_marginTop="@dimen/space_4"
                 android:includeFontPadding="false"
                 android:textColor="@color/text_primary"
-                android:textSize="17sp"
+                android:textSize="@dimen/text_subtitle"
                 android:textStyle="bold" />
 
             <!-- 次信息：农历 · 星期（单行，避免过宽） -->
@@ -148,7 +148,7 @@
                 android:layout_marginTop="@dimen/space_4"
                 android:includeFontPadding="false"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="@dimen/text_body_sm" />
 
             <!-- 辅助信息：干支 -->
             <TextView
@@ -157,74 +157,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:textColor="@color/text_tertiary"
-                android:textSize="13sp"
+                android:textSize="@dimen/text_caption"
                 android:lineSpacingExtra="3dp" />
-        </LinearLayout>
-
-        <!-- ============ 宜 / 忌（轻量信息区）============ -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_group"
-            android:orientation="horizontal"
-            android:padding="@dimen/space_12">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <!-- 绿色仅用于"宜"标签，内容保持中性，避免大面积彩色 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="宜"
-                    android:textColor="@color/green"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvYi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_4"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
-                    android:lineSpacingExtra="2dp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/space_12"
-                android:layout_marginEnd="@dimen/space_12"
-                android:background="@color/divider" />
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <!-- 红色仅用于"忌"标签 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="忌"
-                    android:textColor="@color/red"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvJi"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_4"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp"
-                    android:lineSpacingExtra="2dp" />
-            </LinearLayout>
         </LinearLayout>
 
         <!-- ============ 轻量工具：日期跳转 ============ -->
@@ -240,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="日期跳转"
-                style="@style/Text.Suntime.Title" />
+                style="@style/Text.Suntime.Header" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -252,7 +186,7 @@
                 <EditText
                     android:id="@+id/etJump"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/input_height"
                     android:layout_weight="1"
                     android:background="@drawable/bg_search"
                     android:gravity="center_vertical"
@@ -264,15 +198,15 @@
                     android:paddingEnd="@dimen/space_12"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_body_sm" />
 
                 <Button
                     android:id="@+id/btnJump"
                     style="@style/Widget.Suntime.Button"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/button_height"
                     android:layout_marginStart="@dimen/space_8"
-                    android:minWidth="72dp"
+                    android:minWidth="@dimen/button_min_width"
                     android:text="跳转" />
             </LinearLayout>
         </LinearLayout>
@@ -290,7 +224,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="日期相差计算"
-                style="@style/Text.Suntime.Title" />
+                style="@style/Text.Suntime.Header" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -322,7 +256,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:textColor="@color/primary"
-                android:textSize="14sp" />
+                android:textSize="@dimen/text_body" />
         </LinearLayout>
 
     </LinearLayout>

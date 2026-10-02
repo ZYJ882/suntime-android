@@ -20,9 +20,9 @@
     <color name="divider">#2C3037</color>
     <color name="outline">#3A3F46</color>
 
-    <!-- ===== 功能色（严格收敛：仅 蓝 / 红 / 绿 三色，与浅色一致）===== -->
-    <color name="red">#EF7B7B</color>
-    <color name="green">#6FBF8E</color>
+    <!-- ===== 功能色 =====
+         品牌蓝统一承担强调 / 可点击 / 当前态 / 节气；
+         star 仅用于世界时钟收藏星标（等同品牌蓝）。 -->
     <color name="star">#7FB2E8</color>
 
     <!-- ===== 指南针表盘（深色）===== -->

@@ -25,12 +25,10 @@
     <color name="divider">#E5E7EB</color>
     <color name="outline">#DADCE0</color>
 
-    <!-- ===== 功能色（严格收敛：仅 蓝 / 红 / 绿 三色）=====
-         蓝色：当前日期、当前 Tab、主要按钮、指南针角度、节气、可点击元素
-         红色：指南针红针、"忌"
-         绿色："宜" -->
-    <color name="red">#D93B3B</color>
-    <color name="green">#2E7D4F</color>
+    <!-- ===== 功能色 =====
+         品牌蓝统一承担"强调 / 可点击 / 当前态 / 节气"等语义；
+         指南针红针使用独立的 compass_needle_n，不占用通用色；
+         star 仅用于世界时钟收藏星标（等同品牌蓝）。 -->
     <color name="star">#1976D2</color>
 
     <!-- ===== 指南针表盘（浅色）===== -->

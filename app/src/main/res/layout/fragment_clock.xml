@@ -38,7 +38,7 @@
                 android:includeFontPadding="false"
                 android:text="00:00:00"
                 android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_hero_time"
+                android:textSize="@dimen/text_display"
                 android:fontFamily="sans-serif-light"
                 android:letterSpacing="-0.02" />
 
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_8"
                 android:textColor="@color/text_secondary"
-                android:textSize="15sp" />
+                android:textSize="@dimen/text_body" />
         </LinearLayout>
 
         <View
@@ -74,8 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="世界时钟"
-                    style="@style/Text.Suntime.Title"
-                    android:textStyle="bold" />
+                    style="@style/Text.Suntime.Header" />
 
                 <TextView
                     android:id="@+id/tvWorldCount"
@@ -96,8 +95,8 @@
                 android:paddingEnd="@dimen/space_16">
 
                 <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="@dimen/icon_search"
+                    android:layout_height="@dimen/icon_search"
                     android:alpha="0.6"
                     android:src="@android:drawable/ic_menu_search"
                     app:tint="@color/text_secondary" />
@@ -115,7 +114,7 @@
                     android:maxLines="1"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_body_sm" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -149,8 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="时间计算与跳转"
-                style="@style/Text.Suntime.Title"
-                android:textStyle="bold" />
+                style="@style/Text.Suntime.Header" />
 
             <Button
                 android:id="@+id/btnPickBase"
@@ -181,7 +179,7 @@
                         android:buttonTint="@color/primary"
                         android:checked="true"
                         android:text="加"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/text_body_sm" />
 
                     <RadioButton
                         android:id="@+id/rbSub"
@@ -189,13 +187,13 @@
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/primary"
                         android:text="减"
-                        android:textSize="14sp" />
+                        android:textSize="@dimen/text_body_sm" />
                 </RadioGroup>
 
                 <EditText
                     android:id="@+id/etDeltaDays"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/input_height"
                     android:layout_weight="1"
                     android:layout_marginStart="@dimen/space_8"
                     android:background="@drawable/bg_search"
@@ -206,12 +204,12 @@
                     android:maxLines="1"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_body_sm" />
 
                 <EditText
                     android:id="@+id/etDeltaHours"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/input_height"
                     android:layout_weight="1"
                     android:layout_marginStart="@dimen/space_8"
                     android:background="@drawable/bg_search"
@@ -222,12 +220,12 @@
                     android:maxLines="1"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_body_sm" />
 
                 <EditText
                     android:id="@+id/etDeltaMin"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="@dimen/input_height"
                     android:layout_weight="1"
                     android:layout_marginStart="@dimen/space_8"
                     android:background="@drawable/bg_search"
@@ -238,7 +236,7 @@
                     android:maxLines="1"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_tertiary"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_body_sm" />
             </LinearLayout>
 
             <Button
@@ -255,7 +253,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:textColor="@color/primary"
-                android:textSize="15sp"
+                android:textSize="@dimen/text_body"
                 android:lineSpacingExtra="2dp" />
         </LinearLayout>
 
@@ -272,8 +270,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="两个日期相差多少天"
-                style="@style/Text.Suntime.Title"
-                android:textStyle="bold" />
+                style="@style/Text.Suntime.Header" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -305,7 +302,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/space_12"
                 android:textColor="@color/primary"
-                android:textSize="15sp" />
+                android:textSize="@dimen/text_body" />
         </LinearLayout>
 
     </LinearLayout>

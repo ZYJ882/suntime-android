@@ -57,24 +57,6 @@ object LunarCalendar {
         440795, 462224, 483532, 504758
     )
 
-    // 建除十二神
-    private val jianChu = arrayOf("建", "除", "满", "平", "定", "执", "破", "危", "成", "收", "开", "闭")
-    // 简化宜忌（建除 -> Pair(宜, 忌)）
-    private val yiJi = arrayOf(
-        Pair("出行、上任、会友、动土、嫁娶", "安葬、开仓、诉讼、乘船"),
-        Pair("沐浴、扫舍、出行、解除", "移徙、入宅、安门"),
-        Pair("祭祀、开市、交易、纳财、出行", "动土、安葬、造船"),
-        Pair("修造、安床、出行、栽种", "嫁娶、移徙、诉讼"),
-        Pair("祭祀、祈福、嫁娶、订盟", "出行、词讼、开仓"),
-        Pair("捕捉、纳畜、修造、安床", "开市、出行、移徙"),
-        Pair("破屋、坏垣、求医、解除", "嫁娶、出行、签约"),
-        Pair("安床、祭祀、出行、纳财", "动工、迁徙、词讼"),
-        Pair("嫁娶、开市、入学、出行、纳财", "诉讼、安葬、乘船"),
-        Pair("纳财、收购、修仓、栽种", "出行、嫁娶、开市"),
-        Pair("开市、求医、祭祀、动土", "安葬、移徙、安门"),
-        Pair("筑堤、安葬、闭仓、修补", "出行、开市、嫁娶")
-    )
-
     // ---------- 农历内部计算 ----------
     private fun lYearDays(y: Int): Int {
         var sum = 348
@@ -139,9 +121,7 @@ object LunarCalendar {
         val dayCn: String,
         val term: String?,
         val weekday: String,
-        val constellation: String,
-        val yi: String,
-        val ji: String
+        val constellation: String
     )
 
     fun solarToLunar(year: Int, month: Int, day: Int): Lunar {
@@ -202,12 +182,6 @@ object LunarCalendar {
         val monthName = (if (isLeapMonth) "闰" else "") + monthCn[lunarMonth - 1]
         val dayName = dayCn[lunarDay - 1]
 
-        // 建除
-        val monthBranch = (lunarMonth + 1) % 12
-        val dayZhi = ((jdn(year, month, day) + 49) % 60) % 12
-        val jcIdx = ((dayZhi - monthBranch) % 12 + 12) % 12
-        val (yi, ji) = yiJi[jcIdx]
-
         val weekday = arrayOf("日", "一", "二", "三", "四", "五", "六")[obj.get(Calendar.DAY_OF_WEEK) - 1]
         val constellation = getConstellation(month, day)
         val term = getSolarTerm(year, month, day)
@@ -215,7 +189,7 @@ object LunarCalendar {
         return Lunar(
             lunarYear, lunarMonth, lunarDay, isLeapMonth,
             ganzhiYear, ganzhiMonth, gzDay, zodiac,
-            monthName, dayName, term, "星期$weekday", constellation, yi, ji
+            monthName, dayName, term, "星期$weekday", constellation
         )
     }
 

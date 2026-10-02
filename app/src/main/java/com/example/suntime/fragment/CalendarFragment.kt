@@ -149,9 +149,6 @@ class CalendarFragment : Fragment() {
 
         // 辅助信息：干支 / 生肖 / 星座
         binding.tvGanZhi.text = "${l.ganzhiYear}年 · ${l.ganzhiMonth}月 · ${l.ganzhiDay}日 · ${l.zodiac}年 · ${l.constellation}"
-
-        binding.tvYi.text = l.yi
-        binding.tvJi.text = l.ji
     }
 
     private fun pickDate(onPick: (Int, Int, Int) -> Unit) {

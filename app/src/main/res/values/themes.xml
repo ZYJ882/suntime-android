@@ -107,6 +107,14 @@
         <item name="android:textColor">@color/text_primary</item>
     </style>
 
+    <!-- 分组 / 卡片标题（三页统一）：主色加粗，与"本地时间/当前位置"等次级眉标形成层级 -->
+    <style name="Text.Suntime.Header" parent="">
+        <item name="android:textSize">@dimen/text_item_title</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
     <style name="Text.Suntime.Sub" parent="">
         <item name="android:textSize">@dimen/text_item_sub</item>
         <item name="android:textColor">@color/text_secondary</item>

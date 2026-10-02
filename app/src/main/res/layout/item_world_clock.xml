@@ -4,16 +4,16 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:minHeight="52dp">
+    android:minHeight="@dimen/row_min_height">
 
     <!-- 星标：比城市名小，不抢视觉 -->
     <TextView
         android:id="@+id/tvStar"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="@dimen/star_size"
+        android:layout_height="@dimen/star_size"
         android:gravity="center"
         android:text="☆"
-        android:textSize="13sp"
+        android:textSize="@dimen/text_caption"
         android:textColor="@color/star" />
 
     <LinearLayout
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_body_lg"
             android:textStyle="bold" />
 
         <!-- 二级：国家 · GMT+8 -->
@@ -41,7 +41,7 @@
             android:layout_marginTop="2dp"
             android:includeFontPadding="false"
             android:textColor="@color/text_tertiary"
-            android:textSize="11sp"
+            android:textSize="@dimen/text_tiny"
             android:maxLines="1"
             android:ellipsize="end" />
     </LinearLayout>
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_body_lg"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="-0.01" />
 
@@ -71,6 +71,6 @@
             android:layout_marginTop="2dp"
             android:includeFontPadding="false"
             android:textColor="@color/text_tertiary"
-            android:textSize="11sp" />
+            android:textSize="@dimen/text_tiny" />
     </LinearLayout>
 </LinearLayout>

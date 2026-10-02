@@ -5,8 +5,8 @@
 
     <TextView
         android:id="@+id/tvDayBg"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="@dimen/calendar_dot"
+        android:layout_height="@dimen/calendar_dot"
         android:layout_gravity="center"
         android:background="@drawable/bg_day_circle"
         android:visibility="invisible" />
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            android:textSize="15sp" />
+            android:textSize="@dimen/text_body_lg" />
 
         <TextView
             android:id="@+id/tvLunarNum"
@@ -32,6 +32,6 @@
             android:layout_marginTop="1dp"
             android:includeFontPadding="false"
             android:textColor="@color/text_tertiary"
-            android:textSize="10sp" />
+            android:textSize="@dimen/text_week" />
     </LinearLayout>
 </FrameLayout>
