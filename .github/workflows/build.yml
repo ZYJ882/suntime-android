@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -20,12 +23,12 @@ jobs:
 
       - name: 安装 SDK 组件（platform-34 / build-tools 34.0.0）
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          SDKMANAGER="$(find "$ANDROID_SDK_ROOT/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
       - name: 写入 local.properties
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: 赋予 gradlew 执行权限
