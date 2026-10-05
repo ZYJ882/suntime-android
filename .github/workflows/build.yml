@@ -18,9 +18,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: 安装 Android SDK 并接受协议
-        uses: android-actions/setup-android@v3
-
       - name: 安装 SDK 组件（platform-34 / build-tools 34.0.0）
         run: |
           yes | sdkmanager --licenses
