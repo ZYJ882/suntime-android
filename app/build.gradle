@@ -11,8 +11,10 @@ android {
         applicationId "com.example.suntime"
         minSdk 24
         targetSdk 34
-        versionCode 5
-        versionName "1.4"
+        // 版本号遵循 SemVer 2.0.0 (X.Y.Z，各段可为多位数，禁止前导零/四段)；versionCode 推导：
+        //   versionCode = X*10000000 + Y*10000 + Z  (X<215, Y<10000, Z<10000，多位数下仍严格递增、无碰撞)
+        versionCode 10006000   // 1.6.0
+        versionName "1.6.0"
     }
 
     buildTypes {

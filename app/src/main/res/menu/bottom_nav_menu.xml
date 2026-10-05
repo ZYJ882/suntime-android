@@ -12,4 +12,8 @@
         android:id="@+id/nav_compass"
         android:icon="@drawable/ic_compass"
         android:title="@string/nav_compass" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/nav_settings" />
 </menu>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_16">
+
+        <!-- ============ 外观 / 主题 ============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_group"
+            android:orientation="vertical"
+            android:padding="@dimen/space_12">
+
+            <TextView
+                style="@style/Text.Suntime.Header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_theme" />
+
+            <RadioGroup
+                android:id="@+id/rgTheme"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/rbThemeSystem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/space_8"
+                    android:text="@string/settings_theme_system"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_body_sm" />
+
+                <RadioButton
+                    android:id="@+id/rbThemeLight"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/space_8"
+                    android:text="@string/settings_theme_light"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_body_sm" />
+
+                <RadioButton
+                    android:id="@+id/rbThemeDark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="@dimen/space_8"
+                    android:text="@string/settings_theme_dark"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_body_sm" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <!-- ============ 逆地理 API（可选） ============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_16"
+            android:background="@drawable/bg_group"
+            android:orientation="vertical"
+            android:padding="@dimen/space_12">
+
+            <TextView
+                style="@style/Text.Suntime.Header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_api_title" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:text="@string/settings_api_desc"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_caption"
+                android:lineSpacingExtra="2dp" />
+
+            <EditText
+                android:id="@+id/etAmap"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/space_12"
+                android:background="@drawable/bg_search"
+                android:hint="@string/settings_amap"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/space_12"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <EditText
+                android:id="@+id/etTencent"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/space_8"
+                android:background="@drawable/bg_search"
+                android:hint="@string/settings_tencent"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/space_12"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <EditText
+                android:id="@+id/etTencentSk"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/space_8"
+                android:background="@drawable/bg_search"
+                android:hint="@string/settings_tencent_sk"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/space_12"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <EditText
+                android:id="@+id/etBaidu"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/space_8"
+                android:background="@drawable/bg_search"
+                android:hint="@string/settings_baidu"
+                android:inputType="text"
+                android:paddingHorizontal="@dimen/space_12"
+                android:singleLine="true"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <Button
+                android:id="@+id/btnSave"
+                style="@style/Widget.Suntime.Button"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="@dimen/space_16"
+                android:text="@string/settings_save" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_12"
+            android:text="@string/settings_note"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_caption"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+</ScrollView>

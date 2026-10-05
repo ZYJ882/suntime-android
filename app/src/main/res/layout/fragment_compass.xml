@@ -123,13 +123,30 @@
             android:text="获取当前位置" />
 
         <TextView
+            android:id="@+id/tvAccuracy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_8"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_caption" />
+
+        <TextView
             android:id="@+id/tvAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_12"
-            android:textColor="@color/text_secondary"
+            android:layout_marginTop="@dimen/space_8"
+            android:minLines="2"
+            android:textColor="@color/text_primary"
             android:textSize="@dimen/text_body_sm"
             android:lineSpacingExtra="2dp" />
+
+        <TextView
+            android:id="@+id/tvAddressSource"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_4"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_caption" />
 
     </LinearLayout>
 </ScrollView>

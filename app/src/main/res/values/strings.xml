@@ -3,4 +3,20 @@
     <string name="nav_clock">时钟</string>
     <string name="nav_calendar">日历</string>
     <string name="nav_compass">指南针</string>
+    <string name="nav_settings">设置</string>
+
+    <!-- 设置页 -->
+    <string name="settings_theme">主题</string>
+    <string name="settings_theme_system">跟随系统</string>
+    <string name="settings_theme_light">浅色</string>
+    <string name="settings_theme_dark">深色</string>
+    <string name="settings_api_title">逆地理 API（可选）</string>
+    <string name="settings_api_desc">配置后可提升国内地址解析成功率与精度。Key 仅保存在本机，不会上传。</string>
+    <string name="settings_amap">高德 Key（Web 服务）</string>
+    <string name="settings_tencent">腾讯 Key（WebService）</string>
+    <string name="settings_tencent_sk">腾讯签名 SK</string>
+    <string name="settings_baidu">百度 Key（服务端）</string>
+    <string name="settings_save">保存</string>
+    <string name="settings_saved">已保存</string>
+    <string name="settings_note">未填写时，App 直接走系统定位（海外可用，国内多数机型不可用）。任一服务填对即可生效，界面会显示「地址来源」。</string>
 </resources>

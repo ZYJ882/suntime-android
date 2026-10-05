@@ -8,7 +8,6 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -21,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.suntime.databinding.FragmentCompassBinding
+import com.example.suntime.util.AddressResolver
 import java.util.Locale
 
 class CompassFragment : Fragment(), SensorEventListener, LocationListener {
@@ -85,8 +85,8 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
 
     private fun startLocation() {
         try {
-            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { showLocation(it) }
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.let { showLocation(it) }
+            locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)?.let { onCoord(it) }
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)?.let { onCoord(it) }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 5f, this)
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000L, 5f, this)
         } catch (e: Exception) {
@@ -119,24 +119,46 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
-    private fun showLocation(loc: Location) {
+    // 地址反查节流：位移 > 50m 或间隔 > 30s 才重新请求，避免频繁打网络
+    private var lastAddrLat = Double.NaN
+    private var lastAddrLng = Double.NaN
+    private var lastAddrTime = 0L
+    private val distHolder = FloatArray(1)
+
+    private fun onCoord(loc: Location) {
         binding.tvLat.text = String.format(Locale.CHINA, "%.5f", loc.latitude)
         binding.tvLng.text = String.format(Locale.CHINA, "%.5f", loc.longitude)
-        // 反查地址（需网络）
-        try {
-            val geocoder = Geocoder(requireContext(), Locale.CHINA)
-            val list = geocoder.getFromLocation(loc.latitude, loc.longitude, 1)
-            if (!list.isNullOrEmpty()) {
-                val a = list[0]
-                val parts = listOf(a.countryName, a.adminArea, a.locality, a.thoroughfare).filterNotNull().filter { it.isNotBlank() }
-                binding.tvAddress.text = parts.joinToString(" ")
-            } else binding.tvAddress.text = ""
-        } catch (e: Exception) {
-            binding.tvAddress.text = "（无法解析地址）"
+        val acc = loc.accuracy
+        binding.tvAccuracy.text = if (acc >= 0f && acc.isFinite()) "定位精度 ±${acc.toInt()} 米" else ""
+
+        val now = System.currentTimeMillis()
+        if (!lastAddrLat.isNaN()) {
+            Location.distanceBetween(lastAddrLat, lastAddrLng, loc.latitude, loc.longitude, distHolder)
+        }
+        val moved = lastAddrLat.isNaN() || distHolder[0] > 50f
+        val stale = now - lastAddrTime > 30_000
+        if (moved || stale) {
+            lastAddrLat = loc.latitude
+            lastAddrLng = loc.longitude
+            lastAddrTime = now
+            requestAddress(loc)
         }
     }
 
-    override fun onLocationChanged(loc: Location) = showLocation(loc)
+    private fun requestAddress(loc: Location) {
+        binding.tvAddress.text = "正在解析地址…"
+        binding.tvAddressSource.text = ""
+        AddressResolver.resolve(requireContext(), loc.latitude, loc.longitude) { res ->
+            binding.tvAddress.text = when {
+                res.address != null -> res.address
+                res.error != null -> "地址解析失败：${res.error}"
+                else -> "（无网络或未能解析地址）"
+            }
+            binding.tvAddressSource.text = if (res.provider != null) "地址来源：${res.provider}" else ""
+        }
+    }
+
+    override fun onLocationChanged(loc: Location) = onCoord(loc)
     override fun onProviderDisabled(provider: String) {}
     override fun onProviderEnabled(provider: String) {}
     override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
