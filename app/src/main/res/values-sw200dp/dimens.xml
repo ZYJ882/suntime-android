@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 小屏 / 圆形手表（smallest-width ≤ 约 200–320dp）：整体尺寸降级，保证不溢出 -->
+    <dimen name="text_display">38sp</dimen>
+    <dimen name="text_reading">30sp</dimen>
+    <dimen name="text_title">16sp</dimen>
+    <dimen name="compass_size">168dp</dimen>
+    <dimen name="page_padding_h">8dp</dimen>
+    <dimen name="bottom_nav_height">48dp</dimen>
+    <dimen name="calendar_cell_height">40dp</dimen>
+    <dimen name="space_16">12dp</dimen>
+    <dimen name="chip_height">32dp</dimen>
+    <dimen name="button_min_width">56dp</dimen>
+</resources>

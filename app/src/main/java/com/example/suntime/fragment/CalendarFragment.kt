@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import android.text.Spannable
 import android.text.SpannableString
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.suntime.R
 import com.example.suntime.adapter.CalendarDayAdapter
+import com.example.suntime.adapter.CalendarYearAdapter
 import com.example.suntime.adapter.DayCell
 import com.example.suntime.databinding.FragmentCalendarBinding
 import com.example.suntime.util.DateCalc
@@ -24,6 +26,10 @@ class CalendarFragment : Fragment() {
 
     private var _binding: FragmentCalendarBinding? = null
     private val binding get() = _binding!!
+
+    private enum class CalView { YEAR, MONTH, DAY }
+
+    private var viewMode = CalView.MONTH
 
     private var curYear = 0
     private var curMonth = 0
@@ -81,10 +87,86 @@ class CalendarFragment : Fragment() {
         binding.btnPickC.setOnClickListener { pickDate { y, m, d -> dateC = Triple(y, m, d); binding.btnPickC.text = "起始：$y-$m-$d"; calcDiff2() } }
         binding.btnPickD.setOnClickListener { pickDate { y, m, d -> dateD = Triple(y, m, d); binding.btnPickD.text = "结束：$y-$m-$d"; calcDiff2() } }
 
+        setupViewSwitcher()
+
         renderMonth()
-        updateDetail()
+        applyView()
     }
 
+    // ============ 年 / 月 / 日 视图切换 ============
+    private fun setupViewSwitcher() {
+        binding.chipYear.setOnClickListener { viewMode = CalView.YEAR; applyView() }
+        binding.chipMonth.setOnClickListener { viewMode = CalView.MONTH; applyView() }
+        binding.chipDay.setOnClickListener { viewMode = CalView.DAY; applyView() }
+
+        binding.btnPrevYear.setOnClickListener { curYear--; renderYear() }
+        binding.btnNextYear.setOnClickListener { curYear++; renderYear() }
+        binding.btnThisYear.setOnClickListener { curYear = Calendar.getInstance().get(Calendar.YEAR); renderYear() }
+
+        binding.btnPrevDay.setOnClickListener { addDay(-1) }
+        binding.btnNextDay.setOnClickListener { addDay(1) }
+    }
+
+    private fun applyView() {
+        val m = viewMode == CalView.MONTH
+        val y = viewMode == CalView.YEAR
+        val d = viewMode == CalView.DAY
+        binding.monthHeader.visibility = vis(m)
+        binding.monthContent.visibility = vis(m)
+        binding.yearHeader.visibility = vis(y)
+        binding.yearContent.visibility = vis(y)
+        binding.dayHeader.visibility = vis(d)
+        binding.detailPanel.visibility = vis(m || d)
+
+        styleChip(binding.chipYear, y)
+        styleChip(binding.chipMonth, m)
+        styleChip(binding.chipDay, d)
+
+        when (viewMode) {
+            CalView.YEAR -> renderYear()
+            CalView.DAY -> { updateDetail(); renderDayTitle() }
+            CalView.MONTH -> updateDetail()
+        }
+    }
+
+    private fun vis(show: Boolean) = if (show) View.VISIBLE else View.GONE
+
+    private fun styleChip(chip: TextView, selected: Boolean) {
+        if (selected) {
+            chip.setBackgroundResource(R.drawable.bg_segment_sel)
+            chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.on_primary))
+        } else {
+            chip.background = null
+            chip.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_secondary))
+        }
+    }
+
+    private fun renderYear() {
+        binding.tvYearTitle.text = String.format("%d年", curYear)
+        CalendarYearAdapter.buildInto(binding.llYear, curYear) { y, m ->
+            viewMode = CalView.MONTH
+            curYear = y; curMonth = m; selYear = y; selMonth = m; selDay = 1
+            binding.tvMonthTitle.text = String.format("%d年%d月", curYear, curMonth)
+            applyView()
+            renderMonth()
+            updateDetail()
+        }
+    }
+
+    private fun addDay(delta: Int) {
+        val c = Calendar.getInstance().apply {
+            clear(); set(selYear, selMonth - 1, selDay); add(Calendar.DAY_OF_MONTH, delta)
+        }
+        selYear = c.get(Calendar.YEAR); selMonth = c.get(Calendar.MONTH) + 1; selDay = c.get(Calendar.DAY_OF_MONTH)
+        updateDetail(); renderDayTitle()
+    }
+
+    private fun renderDayTitle() {
+        val l = LunarCalendar.solarToLunar(selYear, selMonth, selDay)
+        binding.tvDayTitle.text = l.weekday
+    }
+
+    // ============ 月视图（原有逻辑保留）============
     private fun addMonth(delta: Int) {
         var m = curMonth + delta
         var y = curYear

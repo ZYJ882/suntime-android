@@ -6,8 +6,9 @@
     android:background="@color/bg"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <!-- 四个页面由 ViewPager2 托管：支持左右滑动切换，并与底部导航双向同步 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- 禁止使用 px / dip 写死尺寸：一律用 dp（尺寸）/ sp（文字），由系统按 DPI 与字号偏好自动缩放 -->
+    <issue id="DpInsteadOfPx" severity="error" />
+
+    <!-- 禁止用硬编码尺寸近似 dp 的写法（如 16px 当作 16dp），同样按 dp 处理 -->
+    <issue id="PxUsage" severity="error" />
+</lint>

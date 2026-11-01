@@ -9,7 +9,56 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/space_16">
+        android:padding="@dimen/space_16"
+        android:maxWidth="@dimen/content_max_width"
+        android:layout_gravity="center_horizontal">
+
+        <!-- ============ 设备信息（只读：分辨率 / DPI / 密度 / 尺寸等级）============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_group"
+            android:orientation="vertical"
+            android:padding="@dimen/space_12">
+
+            <TextView
+                style="@style/Text.Suntime.Header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings_device_info" />
+
+            <TextView
+                android:id="@+id/tvDeviceResolution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <TextView
+                android:id="@+id/tvDeviceDpi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <TextView
+                android:id="@+id/tvDeviceDensity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+
+            <TextView
+                android:id="@+id/tvDeviceSizeClass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_4"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_body_sm" />
+        </LinearLayout>
 
         <!-- ============ 外观 / 主题 ============ -->
         <LinearLayout

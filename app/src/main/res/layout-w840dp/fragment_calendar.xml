@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/page_padding_h"
+        android:paddingEnd="@dimen/page_padding_h"
+        android:paddingTop="@dimen/page_padding_top"
+        android:paddingBottom="@dimen/space_16"
+        android:maxWidth="@dimen/content_max_width"
+        android:layout_gravity="center_horizontal">
+
+        <!-- ============ Expanded 双栏：左月历 / 右详情+工具 ============ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- ===== 左栏：日历网格 ===== -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- 视图切换：年 / 月 / 日 -->
+                <LinearLayout
+                    android:id="@+id/segViews"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/chip_height"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:background="@drawable/bg_group"
+                    android:orientation="horizontal"
+                    android:padding="2dp">
+
+                    <TextView
+                        android:id="@+id/chipYear"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="年"
+                        android:textSize="@dimen/text_body_sm"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chipMonth"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="月"
+                        android:textSize="@dimen/text_body_sm"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chipDay"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="日"
+                        android:textSize="@dimen/text_body_sm"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 月表头 -->
+                <LinearLayout
+                    android:id="@+id/monthHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnPrevMonth"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="上个月"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_previous"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvMonthTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnNextMonth"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="下个月"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_next"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/btnToday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/chip_height"
+                        android:layout_marginStart="@dimen/space_8"
+                        android:background="@drawable/bg_search"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/space_12"
+                        android:paddingEnd="@dimen/space_12"
+                        android:text="今天"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_body_sm" />
+                </LinearLayout>
+
+                <!-- 月内容 -->
+                <LinearLayout
+                    android:id="@+id/monthContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvCalendar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:nestedScrollingEnabled="false"
+                        android:overScrollMode="never" />
+                </LinearLayout>
+
+                <!-- 年表头 -->
+                <LinearLayout
+                    android:id="@+id/yearHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageButton
+                        android:id="@+id/btnPrevYear"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="上一年"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_previous"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvYearTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_title"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnNextYear"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="下一年"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_next"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/btnThisYear"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/chip_height"
+                        android:layout_marginStart="@dimen/space_8"
+                        android:background="@drawable/bg_search"
+                        android:gravity="center"
+                        android:paddingStart="@dimen/space_12"
+                        android:paddingEnd="@dimen/space_12"
+                        android:text="今年"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_body_sm" />
+                </LinearLayout>
+
+                <!-- 年内容 -->
+                <LinearLayout
+                    android:id="@+id/yearContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/llYear"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ===== 右栏：选中日详情 + 工具 ===== -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/space_16"
+                android:orientation="vertical">
+
+                <!-- 日表头 -->
+                <LinearLayout
+                    android:id="@+id/dayHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageButton
+                        android:id="@+id/btnPrevDay"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="上一天"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_previous"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/tvDayTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_subtitle"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btnNextDay"
+                        style="@style/Widget.Suntime.Button.Icon"
+                        android:layout_width="@dimen/icon_button_size"
+                        android:layout_height="@dimen/icon_button_size"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="下一天"
+                        android:scaleType="centerInside"
+                        android:src="@android:drawable/ic_media_next"
+                        app:tint="@color/text_secondary" />
+                </LinearLayout>
+
+                <!-- 选中日期详情 -->
+                <LinearLayout
+                    android:id="@+id/detailPanel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/space_16"
+                    android:paddingBottom="@dimen/space_12">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/divider" />
+
+                    <TextView
+                        android:id="@+id/tvDayBig"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_20"
+                        android:fontFamily="sans-serif-light"
+                        android:includeFontPadding="false"
+                        android:letterSpacing="-0.03"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_display" />
+
+                    <TextView
+                        android:id="@+id/tvGregorian"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_subtitle"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvLunarLine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_4"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_body_sm" />
+
+                    <TextView
+                        android:id="@+id/tvGanZhi"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:lineSpacingExtra="3dp"
+                        android:textColor="@color/text_tertiary"
+                        android:textSize="@dimen/text_caption" />
+                </LinearLayout>
+
+                <!-- 轻量工具：日期跳转 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:background="@drawable/bg_group"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_12">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Text.Suntime.Header"
+                        android:text="日期跳转" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/etJump"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/input_height"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_search"
+                            android:gravity="center_vertical"
+                            android:hint="YYYY-MM-DD"
+                            android:importantForAutofill="no"
+                            android:inputType="date"
+                            android:maxLines="1"
+                            android:paddingStart="@dimen/space_12"
+                            android:paddingEnd="@dimen/space_12"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="@color/text_tertiary"
+                            android:textSize="@dimen/text_body_sm" />
+
+                        <Button
+                            android:id="@+id/btnJump"
+                            style="@style/Widget.Suntime.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/button_height"
+                            android:layout_marginStart="@dimen/space_8"
+                            android:minWidth="@dimen/button_min_width"
+                            android:text="跳转" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 轻量工具：日期相差计算 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:background="@drawable/bg_group"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_12">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Text.Suntime.Header"
+                        android:text="日期相差计算" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btnPickC"
+                            style="@style/Widget.Suntime.Button.Outlined"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="起始日期" />
+
+                        <Button
+                            android:id="@+id/btnPickD"
+                            style="@style/Widget.Suntime.Button.Outlined"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/space_8"
+                            android:text="结束日期" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvDiff2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:textColor="@color/primary"
+                        android:textSize="@dimen/text_body" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Medium（≥600dp，手机横屏/小平板）：内容限宽并增加边距，避免拉伸 -->
+    <dimen name="content_max_width">600dp</dimen>
+    <dimen name="page_padding_h">24dp</dimen>
+</resources>

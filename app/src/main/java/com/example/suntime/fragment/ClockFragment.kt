@@ -2,6 +2,7 @@ package com.example.suntime.fragment
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,13 +10,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.suntime.R
+import com.example.suntime.StopwatchActivity
+import com.example.suntime.TimerActivity
 import com.example.suntime.adapter.WorldClockAdapter
 import com.example.suntime.databinding.FragmentClockBinding
 import com.example.suntime.util.CityData
 import com.example.suntime.util.DateCalc
+import com.example.suntime.util.WindowSize
+import com.example.suntime.util.WindowSizeClass
 import com.example.suntime.view.LightDividerDecoration
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -57,7 +65,13 @@ class ClockFragment : Fragment() {
             sp.edit().putStringSet("zones", favZones).apply()
             adapter.setFavorites(favZones)
         }
-        binding.rvWorldClock.layoutManager = LinearLayoutManager(requireContext())
+        // 世界时钟列数随窗口尺寸等级自适应：紧凑 1 列 / 中等 2 列 / 展开 3 列
+        val worldSpan = when (WindowSize.classify(requireContext())) {
+            WindowSizeClass.EXPANDED -> 3
+            WindowSizeClass.MEDIUM -> 2
+            else -> 1
+        }
+        binding.rvWorldClock.layoutManager = GridLayoutManager(requireContext(), worldSpan)
         binding.rvWorldClock.adapter = adapter
         binding.rvWorldClock.addItemDecoration(LightDividerDecoration(requireContext()))
 
@@ -88,6 +102,26 @@ class ClockFragment : Fragment() {
         // 日期差值
         binding.btnPickDateA.setOnClickListener { pickDate { y, m, d -> dateA = Triple(y, m, d); binding.btnPickDateA.text = "起始：$y-$m-$d"; calcDiff() } }
         binding.btnPickDateB.setOnClickListener { pickDate { y, m, d -> dateB = Triple(y, m, d); binding.btnPickDateB.text = "结束：$y-$m-$d"; calcDiff() } }
+
+        // 右上角秒表入口：弹出小菜单，选择「计时器 / 秒表」进入对应页面
+        binding.btnClockTools.setOnClickListener { anchor ->
+            val popup = PopupMenu(requireContext(), anchor)
+            popup.menuInflater.inflate(R.menu.clock_tools_menu, popup.menu)
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.menu_timer -> {
+                        startActivity(Intent(requireContext(), TimerActivity::class.java))
+                        true
+                    }
+                    R.id.menu_stopwatch -> {
+                        startActivity(Intent(requireContext(), StopwatchActivity::class.java))
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
     }
 
     private fun updateBaseLabel() {

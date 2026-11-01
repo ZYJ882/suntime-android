@@ -15,7 +15,9 @@
         android:paddingStart="@dimen/page_padding_h"
         android:paddingEnd="@dimen/page_padding_h"
         android:paddingTop="@dimen/page_padding_top"
-        android:paddingBottom="@dimen/space_16">
+        android:paddingBottom="@dimen/space_16"
+        android:maxWidth="@dimen/content_max_width"
+        android:layout_gravity="center_horizontal">
 
         <!-- ============ 指南盘（上提，消除下方空白）============ -->
         <com.example.suntime.view.CompassView

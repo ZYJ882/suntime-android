@@ -24,6 +24,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 时钟工具：计时器 / 秒表（从时钟页右上角菜单进入） -->
+        <activity
+            android:name=".TimerActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".StopwatchActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

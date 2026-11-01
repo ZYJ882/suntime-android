@@ -20,6 +20,11 @@
     <dimen name="page_padding_h">16dp</dimen>
     <dimen name="page_padding_top">8dp</dimen>
 
+    <!-- ===== 内容最大宽度（响应式限宽，避免平板拉伸）=====
+         手机 = 10000dp（不限制，等效满宽）；
+         平板 w600dp = 600dp；大屏 w840dp = 1080dp（见各限定符目录覆盖）。 -->
+    <dimen name="content_max_width">10000dp</dimen>
+
     <!-- ===== 字阶（统一三页，消除散落 sp）===== -->
     <dimen name="text_display">56sp</dimen>     <!-- 主视觉大数字 / 本地时间 -->
     <dimen name="text_reading">40sp</dimen>     <!-- 指南针核心读数 -->

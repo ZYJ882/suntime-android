@@ -9,7 +9,46 @@
 > 下列日期为开发序列的近似时间；`v1.6.0` 为首次按规范整理 CHANGELOG 的版本（实际交付日 2026-10-05）。
 > 正式发版后请以 Git Tag 日期为准。
 
-## [Unreleased]
+## [1.10.0] - 2026-11-02
+
+### Added
+
+- 时钟页右上角新增**秒表入口图标**，点击弹出「计时器 / 秒表」小菜单
+  - 新增 `TimerActivity`（倒计时：时/分/秒输入，开始 / 暂停 / 继续 / 重置，结束提示）
+  - 新增 `StopwatchActivity`（秒表：开始 / 暂停 / 继续 / 重置，精确到 0.01 秒，基于 `SystemClock.elapsedRealtime()`）
+  - 新增 `drawable/ic_stopwatch.xml`、`menu/clock_tools_menu.xml`、`layout/activity_timer.xml`、`layout/activity_stopwatch.xml`
+  - `ClockFragment` 接入 `PopupMenu` 并跳转；`AndroidManifest.xml` 注册两个 Activity
+
+## [1.9.0] - 2026-11-02
+
+### Added
+
+- 四个页面支持**左右滑动切换**（`ViewPager2` + `FragmentStateAdapter`）
+  - 新增 `adapter/MainPagerAdapter.kt`（时钟 / 日历 / 指南针 / 设置 四页）
+  - `MainActivity` 改为 ViewPager2 托管，并与底部导航**双向同步**：滑动更新选中态、点击导航切页，带 `syncingNav` 防循环守卫
+  - `activity_main.xml` 的 `FrameLayout` 容器替换为 `ViewPager2`（id `viewPager`）
+  - 新增依赖 `androidx.viewpager2:viewpager2:1.0.0`
+
+## [1.8.0] - 2026-11-02
+
+### Added
+
+- 安卓多端（手机 / 平板 / 小屏圆形设备）响应式适配
+  - 新增 `util/WindowSize.kt`：按窗口宽度(dp) 分类 Compact(<600) / Medium(600–839) / Expanded(≥840)
+  - 新增 `util/ScreenInfo.kt`：读取屏幕分辨率(px)、DPI、density、scaledDensity 并归类尺寸等级（设置页「设备信息」卡只读展示）
+  - 资源限定符：`values-w600dp` / `values-w840dp` / `values-sw200dp`（平板限宽居中、大屏放大核心尺寸、小屏尺寸降级）；`layout-w600dp/fragment_settings`（双栏卡片）、`layout-w840dp/fragment_calendar`、`layout-w840dp/fragment_compass`（大屏双栏）
+  - `ClockFragment` 世界时钟按尺寸等级用 `GridLayoutManager` 切换列数（紧凑 1 / 中等 2 / 展开 3 列）
+  - 各页内容限最大宽度并居中，避免平板拉伸
+- 新增 `app/lint.xml`：将 `DpInsteadOfPx`、`PxUsage` 设为 error，构建期拦截 px 硬编码
+
+## [1.7.0] - 2026-10-18
+
+### Added
+
+- 日历新增「年 / 月 / 日」三视图切换：顶部 年/月/日 分段栏，一键在三种视图间切换
+  - **年视图**：12 宫格小月历总览全年（每月含农历/节气小字、今日高亮），点击某月直达该月月视图
+  - **月视图**：保留原有 7 列月历网格与选中日详情
+  - **日视图**：以选中日为核心展示公历/农历/星期/干支/生肖/星座/节气，支持上一天/下一天连续切换
 
 ## [1.6.0] - 2026-10-05
 

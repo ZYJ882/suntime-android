@@ -14,7 +14,9 @@
         android:paddingStart="@dimen/page_padding_h"
         android:paddingEnd="@dimen/page_padding_h"
         android:paddingTop="@dimen/page_padding_top"
-        android:paddingBottom="@dimen/space_16">
+        android:paddingBottom="@dimen/space_16"
+        android:maxWidth="@dimen/content_max_width"
+        android:layout_gravity="center_horizontal">
 
         <!-- ============ 本地时间（视觉核心）============ -->
         <LinearLayout
@@ -24,11 +26,31 @@
             android:paddingTop="@dimen/space_16"
             android:paddingBottom="@dimen/space_16">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="本地时间"
-                style="@style/Text.Suntime.Section" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="本地时间"
+                    style="@style/Text.Suntime.Section" />
+
+                <!-- 右上角秒表入口：点击弹出「计时器 / 秒表」小菜单 -->
+                <ImageButton
+                    android:id="@+id/btnClockTools"
+                    style="@style/Widget.Suntime.Button.Icon"
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/clock_tools"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_stopwatch"
+                    app:tint="@color/text_secondary" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvLocalTime"

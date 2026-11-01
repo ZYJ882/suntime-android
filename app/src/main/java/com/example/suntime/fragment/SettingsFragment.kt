@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import com.example.suntime.R
 import com.example.suntime.databinding.FragmentSettingsBinding
+import com.example.suntime.util.ScreenInfoReader
 import com.example.suntime.util.SettingsStore
 
 class SettingsFragment : Fragment() {
@@ -28,6 +29,13 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val ctx = requireContext()
+
+        // 设备信息（只读）：读取屏幕分辨率 / DPI / 密度 / 窗口尺寸等级
+        val info = ScreenInfoReader.read(ctx)
+        binding.tvDeviceResolution.text = "分辨率：${info.resolution}（${info.widthDp} × ${info.heightDp} dp）"
+        binding.tvDeviceDpi.text = "密度：${info.densityLabel}"
+        binding.tvDeviceDensity.text = "scaleDensity：${String.format(java.util.Locale.CHINA, "%.2f", info.scaledDensity)}（文字随系统字号缩放）"
+        binding.tvDeviceSizeClass.text = "窗口尺寸等级：${info.sizeClass.label}（宽 ${info.widthDp}dp）"
 
         // 主题：根据已保存模式勾选对应单选
         when (SettingsStore.getThemeMode(ctx)) {

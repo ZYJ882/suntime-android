@@ -5,6 +5,33 @@
     <string name="nav_compass">指南针</string>
     <string name="nav_settings">设置</string>
 
+    <!-- 时钟工具（右上角秒表入口） -->
+    <string name="clock_tools">计时工具</string>
+    <string name="clock_timer">计时器</string>
+    <string name="clock_stopwatch">秒表</string>
+    <string name="back">返回</string>
+
+    <!-- 计时器 -->
+    <string name="timer_title">计时器</string>
+    <string name="timer_hint_hours">时</string>
+    <string name="timer_hint_minutes">分</string>
+    <string name="timer_hint_seconds">秒</string>
+    <string name="timer_start">开始</string>
+    <string name="timer_pause">暂停</string>
+    <string name="timer_resume">继续</string>
+    <string name="timer_reset">重置</string>
+    <string name="timer_set_duration">设置时长</string>
+    <string name="timer_input_hint">请先设置时长</string>
+    <string name="timer_finished">计时结束</string>
+
+    <!-- 秒表 -->
+    <string name="stopwatch_title">秒表</string>
+    <string name="stopwatch_start">开始</string>
+    <string name="stopwatch_pause">暂停</string>
+    <string name="stopwatch_resume">继续</string>
+    <string name="stopwatch_reset">重置</string>
+    <string name="stopwatch_hint">精确到 0.01 秒</string>
+
     <!-- 设置页 -->
     <string name="settings_theme">主题</string>
     <string name="settings_theme_system">跟随系统</string>
@@ -18,5 +45,6 @@
     <string name="settings_baidu">百度 Key（服务端）</string>
     <string name="settings_save">保存</string>
     <string name="settings_saved">已保存</string>
+    <string name="settings_device_info">设备信息</string>
     <string name="settings_note">未填写时，App 直接走系统定位（海外可用，国内多数机型不可用）。任一服务填对即可生效，界面会显示「地址来源」。</string>
 </resources>

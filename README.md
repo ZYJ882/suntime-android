@@ -6,15 +6,16 @@
 
 一个使用 **Kotlin + AndroidX（ViewBinding + Material Components）** 开发的原生安卓应用，
 底部导航栏包含四个页面：**时钟 / 日历 / 指南针 / 设置**。
+页面由 **ViewPager2** 托管，支持**左右滑动切换**，并与底部导航双向同步（滑动更新选中态、点击导航切页）。
 
 ### 功能概览
 
 | 页面 | 功能 |
 |------|------|
-| **时钟** | ① 本地时间实时显示；② 世界时钟——按城市/国家**搜索**各地当前时间、加★收藏（本地持久化）；③ **时间计算与跳转**——选定基准时间并加减天/时/分得到结果；④ 两个日期**相差天数**计算 |
-| **日历** | ① 月历宫格（含农历小字、今日高亮、点击选中）；② 公历 + **农历**详情：干支年月日、生肖、星座、节气；③ **日期跳转**（输入 `YYYY-MM-DD`）；④ **日期相差**计算 |
+| **时钟** | ① 本地时间实时显示；② 世界时钟——按城市/国家**搜索**各地当前时间、加★收藏（本地持久化）；③ **时间计算与跳转**——选定基准时间并加减天/时/分得到结果；④ 两个日期**相差天数**计算；⑤ **计时器 / 秒表**——右上角秒表图标点击弹出小菜单进入 |
+| **日历** | ① **年 / 月 / 日 三视图切换**（顶部分段栏，一键切换）；② **年视图**：12 宫格小月历总览全年，点击某月直达；③ 月历宫格（含农历小字、今日高亮、点击选中）；④ 公历 + **农历**详情：干支年月日、生肖、星座、节气；⑤ **日视图**：选中日详情 + 上一天/下一天切换；⑥ **日期跳转**（输入 `YYYY-MM-DD`）；⑦ **日期相差**计算 |
 | **指南针** | ① 磁传感器实时指北（带平滑滤波）；② 显示**经纬度**（GPS/网络定位，运行时申请权限）；③ **反查具体地址**（国内走高德/腾讯/百度、海外走系统 Geocoder，全球覆盖，并标明地址来源）；④ 朝向角度与方位（北/东北/…） |
-| **设置** | ① **主题切换**：浅色 / 深色 / 跟随系统（启动时即应用）；② **逆地理 API Key 配置**：高德 / 腾讯 / 百度，保存在本机，提升国内地址解析成功率与精度；③ 版本信息 |
+| **设置** | ① **主题切换**：浅色 / 深色 / 跟随系统（启动时即应用）；② **逆地理 API Key 配置**：高德 / 腾讯 / 百度，保存在本机，提升国内地址解析成功率与精度；③ **设备信息**（只读）：分辨率 / DPI / 密度 / 窗口尺寸等级；④ 版本信息 |
 
 ### 支持的农历范围
 
@@ -36,6 +37,8 @@ Suntime/
         ├── AndroidManifest.xml
         ├── java/com/example/suntime/
         │   ├── MainActivity.kt
+        │   ├── TimerActivity.kt        # 计时器（倒计时）页面
+        │   ├── StopwatchActivity.kt    # 秒表页面
         │   ├── fragment/
         │   │   ├── ClockFragment.kt
         │   │   ├── CalendarFragment.kt
@@ -48,16 +51,19 @@ Suntime/
         │   │   ├── MapKeys.kt         # 高德/腾讯/百度 逆地理 Key 内置默认（可被设置页覆盖）
         │   │   ├── SettingsStore.kt   # 全局设置持久化（API Key + 主题）
         │   │   ├── CoordTransform.kt  # WGS-84↔GCJ-02↔BD-09 坐标转换
-        │   │   └── AddressResolver.kt # 多服务商逆地理（全球覆盖）
+        │   │   ├── AddressResolver.kt # 多服务商逆地理（全球覆盖）
+        │   │   ├── WindowSize.kt      # 窗口尺寸等级分类（Compact/Medium/Expanded）
+        │   │   └── ScreenInfo.kt      # 读取屏幕分辨率/DPI/密度，归类尺寸等级
         │   ├── view/
         │   │   └── CompassView.kt     # 自定义指南针 View
         │   └── adapter/
+        │       ├── MainPagerAdapter.kt   # 四页 ViewPager2 分页（滑动切页）
         │       ├── WorldClockAdapter.kt
         │       └── CalendarDayAdapter.kt
         └── res/
-            ├── layout/ (activity_main / fragment_clock / fragment_calendar / fragment_compass / fragment_settings / item_world_clock / item_calendar_day)
-            ├── menu/bottom_nav_menu.xml
-            ├── drawable/ (ic_clock / ic_calendar / ic_compass / ic_settings / ic_launcher)
+            ├── layout/ (activity_main / activity_timer / activity_stopwatch / fragment_clock / fragment_calendar / fragment_compass / fragment_settings / item_world_clock / item_calendar_day)
+            ├── menu/ (bottom_nav_menu / clock_tools_menu)
+            ├── drawable/ (ic_clock / ic_calendar / ic_compass / ic_settings / ic_stopwatch / ic_launcher)
             └── values/ (strings / colors / themes)
 ```
 
@@ -131,7 +137,15 @@ Suntime/
 | **Y** | Minor | **向后兼容地新增功能** | `Y+1`，**Z 归零** |
 | **Z** | Patch | **仅向后兼容的 Bug 修复 / 内部修正 / 小幅优化** | `Z+1` |
 
-**优先级（一次迭代含多种变更时取最高）**：`Major > Minor > Patch`。**按兼容性影响判断，而非代码行数、文件数或工作量。**
+**优先级（一次迭代含多种变更时取最高）**：`Major > Minor > Patch`。**按兼容性影响判断，而非代码行数、文件数或工作量。** 涉及破坏性变更时，**AI 须先向用户说明影响并确认，不得擅自升 Major。**
+
+**变更分类示例**（判定级别时对照，按兼容性影响而非工作量）：
+
+| 级别 | 典型变更（包括但不限于） |
+|------|------------------------|
+| **Major** | 删除/重命名/修改已有公开 API；修改参数、返回值或接口结构导致原有调用失效；可选参数改为必填；删除配置项、环境变量、命令行参数或已有功能；修改数据库、文件、网络协议或数据格式导致旧版本不兼容；修改默认行为、权限、认证、核心业务规则或已有用户流程，导致现有集成失效 |
+| **Minor** | 新增页面、模块、功能、API 或业务能力；新增可选参数/可选配置（旧用法仍有效）；新增命令、导出格式、通知方式或第三方集成；新增数据字段（旧数据仍可读）；新增权限或角色但不改变已有行为；将公开 API 标记为 deprecated 但暂仍可用 |
+| **Patch** | 修复崩溃、异常、错误提示、逻辑、计算、校验、排序、过滤、格式化或显示问题；修复兼容性或安全问题且不破坏公开 API；优化性能、内存或内部实现但不新增功能；修正文档、测试或构建配置问题 |
 
 **公开 API 范围**：不仅含函数/类，还包括 HTTP/RPC/GraphQL/WebSocket 接口、SDK 导出、参数与数据结构、配置/环境变量/命令行参数、数据库/导入导出/网络协议格式、插件接口/权限模型/认证方式、稳定文档承诺的行为、用户依赖的默认行为与已有操作流程。任一变化导致已有用户/脚本/插件/配置/调用方无法正常工作 → 优先判 Major。
 
@@ -141,7 +155,11 @@ Suntime/
 `versionCode = X*10000000 + Y*10000 + Z`（例：`1.6.0 → 10006000`，`2.6.65 → 20606500`）。
 该公式在 **X<215、Y<10000、Z<10000** 范围内严格保持 `X.Y.Z` 的字典序递增、无碰撞，可正确容纳多位数。
 
-**初始开发与 1.0.0**：本项目已处于 `1.y.z`（≥1.0.0），默认视为 API 已稳定。**AI 严禁擅自将 `0.y.z → 1.0.0`**；若未来出现 `0.y.z` 阶段，须先询问用户“公开 API 是否已稳定并准备正式承诺兼容性？是否确认发布 1.0.0？”，待用户明确同意才升级。
+**`0.y.z` 初始开发阶段与 1.0.0**（本项目已处于 `1.y.z`，即 ≥1.0.0，默认视为 API 已稳定）：
+
+- 该阶段公开 API 通常不稳定：Bug 修复 `0.4.2 → 0.4.3`；向后兼容新功能 `0.4.2 → 0.5.0`；不兼容变更按项目约定升 Minor。
+- 进入 `1.0.0` 无固定的版本号/时间/功能数量条件；当**公开 API 已确定、核心功能可用、准备向用户/生产环境承诺稳定兼容性、已有用户依赖当前 API、团队愿意对后续破坏性变更使用 Major** 时，可**建议**发布 `1.0.0`（如 `0.9.5 → 1.0.0`）。
+- **AI 严禁擅自将 `0.y.z → 1.0.0`**：必须先询问用户"公开 API 是否已稳定，并准备正式承诺兼容性？是否确认发布 1.0.0？"，待用户明确同意后才升级。
 
 **预发布 / 构建元数据**（可选）：先定 `X.Y.Z` 再追加 —— 预发布 `1.6.0-alpha` / `1.6.0-beta.1` / `1.6.0-rc.1`（低于对应正式版，不替代 X/Y/Z 判断）；构建元数据 `1.6.0+build.20261005`（记录构建号/提交哈希，不影响优先级）。
 
@@ -182,6 +200,36 @@ app/build/outputs/apk/debug/app-debug.apk
 
 > 前提：本机/CI 需能访问 Google Android 仓库（安装 `platforms;android-34` 与 `build-tools;34.0.0`）。
 > 依赖解析走阿里云镜像，国内外均可。
+
+### 多端适配（响应式）
+
+一套代码同时适配 **手机 / 平板 / 小屏圆形设备（手表同 APK 侧载）**，遵循 Android 官方响应式规范，核心原则：
+
+- **尺寸用 `dp`、文字用 `sp`**：所有尺寸/字号统一走 `res/values/dimens.xml` 的语义 token，**禁止**在资源里直接写 `px`/`dip` 硬编码；`sp` 随系统字号偏好缩放，`dp` 随屏幕 DPI 缩放。
+- **禁止全局缩放界面**：**绝不**修改 `DisplayMetrics.density`、调用 `updateConfiguration` 缩放，或对 `setContentView` 做整体缩放——所有适配都基于 dp/sp + 资源限定符 + 代码内尺寸等级切换，保证不同设备一致、不模糊、不破坏无障碍。
+- **依据窗口尺寸分类切换布局**：采用 Android **Window Size Class** 规范，`util/WindowSize.kt` 按「窗口宽度(dp)」分类：
+  | 等级 | 宽度(dp) | 典型设备 |
+  |------|----------|----------|
+  | `COMPACT` 紧凑 | < 600 | 手机竖屏 |
+  | `MEDIUM` 中等 | 600–839 | 手机横屏 / 小平板 / 折叠屏展开 |
+  | `EXPANDED` 展开 | ≥ 840 | 平板 / 桌面 / ChromeOS |
+
+**资源限定符目录（自动选布局/尺寸，无需写分支）**
+
+| 目录 | 作用 |
+|------|------|
+| `res/values-w600dp/dimens.xml` | Medium+：内容限宽 `600dp`、加大边距 |
+| `res/values-w840dp/dimens.xml` | Expanded：限宽 `1080dp`、放大指南针/主数字 |
+| `res/values-sw200dp/dimens.xml` | 小屏/圆形设备：整体尺寸降级，防溢出 |
+| `res/layout-w600dp/fragment_settings.xml` | 设置页主题卡 + API 卡**并排双栏** |
+| `res/layout-w840dp/fragment_calendar.xml` | 日历**双栏**（左月历 / 右详情+工具） |
+| `res/layout-w840dp/fragment_compass.xml` | 指南针**双栏**（左表盘 / 右读数） |
+
+> 尺寸限定符（`w*`/`sw*`）与夜间主题（`night`）是正交的，二者自动叠加，无需额外 `values-night-w*` 目录。
+
+**代码内自适应**：`ClockFragment` 的世界时钟列表按尺寸等级用 `GridLayoutManager` 切换列数（紧凑 1 列 / 中等 2 列 / 展开 3 列）；`SettingsFragment` 通过 `ScreenInfoReader` 读取分辨率/DPI/密度并在「设备信息」卡展示。
+
+**静态守卫**：`app/lint.xml` 已将 `DpInsteadOfPx`、`PxUsage` 设为 `error`，构建期即拦截 px 硬编码；交付前静态校验脚本同样会扫描 px 与全局缩放反模式。
 
 ### 主要依赖
 
