@@ -14,13 +14,12 @@ import java.util.Calendar
 /**
  * 年视图中的迷你月历卡片：整月用 Canvas 一次性绘制，**一个卡片只对应一个 View**。
  *
- * 为什么不用 42 个 TextView：
- * 年视图需要在切换瞬间渲染 12 个月，若每月用 42 个格子控件，会创建 500+ 个 View 并触发
- * 多次测量/布局，主线程必然掉帧。这里改为单个自绘 View，12 个月共 12 个 View，
- * 首帧只需十几次 `drawText`，切换无可感知延迟。
- *
- * 视觉：月份标题 + 星期表头 + 6 行日期；今天主色实心圆高亮，非本月补位日期淡显。
- * 所有尺寸走 dp/sp 换算，颜色取自主题色（浅色/深色自动适配）。
+ * 性能设计（1.11.3 进一步优化）：
+ * - 月份网格（首日星期、天数、42 格日号、今天位置）在 [bind] 时**预计算一次**，
+ *   `onDraw` 只做绘制；原实现每次重绘都要创建 2~3 个 Calendar 并重新推算，
+ *   12 张卡片在滑动/重绘时会产生上百次临时对象分配；
+ * - 复用单个 [Paint.FontMetrics] 对象，避免每段文字都分配一个 FontMetrics；
+ * - 颜色、字号在构造/绑定阶段确定，绘制过程零查找。
  */
 class MiniMonthView @JvmOverloads constructor(
     context: Context,
@@ -34,6 +33,7 @@ class MiniMonthView @JvmOverloads constructor(
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, v, resources.displayMetrics)
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG)
+    private val fm = Paint.FontMetrics()
 
     private val cTextPrimary = ContextCompat.getColor(context, R.color.text_primary)
     private val cTextTertiary = ContextCompat.getColor(context, R.color.text_tertiary)
@@ -50,11 +50,12 @@ class MiniMonthView @JvmOverloads constructor(
     private val weekH = dp(18f)
     private val rowH = dp(22f)
 
-    private var year = 2000
     private var month = 1
-    private var todayY = 0
-    private var todayM = 0
-    private var todayD = 0
+
+    /** 42 格预计算数据：日号 + 是否本月 + 今天所在格（-1 表示不在本月）。 */
+    private val dayNumbers = IntArray(ROWS * 7)
+    private val inMonth = BooleanArray(ROWS * 7)
+    private var todayIndex = -1
 
     init {
         setBackgroundResource(R.drawable.bg_mini_month)
@@ -64,11 +65,34 @@ class MiniMonthView @JvmOverloads constructor(
 
     /** 绑定要显示的月份；today* 由调用方统一传入，避免每张卡片重复取系统时间。 */
     fun bind(year: Int, month: Int, todayY: Int, todayM: Int, todayD: Int) {
-        this.year = year
         this.month = month
-        this.todayY = todayY
-        this.todayM = todayM
-        this.todayD = todayD
+
+        val first = Calendar.getInstance().apply { clear(); set(year, month - 1, 1) }
+        val firstWd = first.get(Calendar.DAY_OF_WEEK) - 1          // 0 = 周日
+        val days = first.getActualMaximum(Calendar.DAY_OF_MONTH)
+        // 上月最后一天：把日期设为 0 即可回退到上月月末
+        val prevMonthDays = Calendar.getInstance().apply {
+            clear(); set(year, month - 1, 0)
+        }.get(Calendar.DAY_OF_MONTH)
+
+        for (i in dayNumbers.indices) {
+            when {
+                i < firstWd -> {
+                    dayNumbers[i] = prevMonthDays - firstWd + i + 1
+                    inMonth[i] = false
+                }
+                i < firstWd + days -> {
+                    dayNumbers[i] = i - firstWd + 1
+                    inMonth[i] = true
+                }
+                else -> {
+                    dayNumbers[i] = i - firstWd - days + 1
+                    inMonth[i] = false
+                }
+            }
+        }
+        todayIndex = if (year == todayY && month == todayM) firstWd + todayD - 1 else -1
+
         invalidate()
     }
 
@@ -91,12 +115,7 @@ class MiniMonthView @JvmOverloads constructor(
         paint.textSize = sp(15f)
         paint.color = cTextPrimary
         paint.textAlign = Paint.Align.LEFT
-        canvas.drawText(
-            "${month}月",
-            padH,
-            baselineFor(padV + titleH / 2f),
-            paint
-        )
+        canvas.drawText("${month}月", padH, baselineFor(padV + titleH / 2f), paint)
 
         // ---------- 星期表头 ----------
         paint.typeface = normal
@@ -108,51 +127,26 @@ class MiniMonthView @JvmOverloads constructor(
             canvas.drawText(WEEK_LABELS[i], padH + cellW * (i + 0.5f), baselineFor(weekCenterY), paint)
         }
 
-        // ---------- 日期网格 ----------
-        val first = Calendar.getInstance().apply { clear(); set(year, month - 1, 1) }
-        val firstWd = first.get(Calendar.DAY_OF_WEEK) - 1        // 0 = 周日
-        val days = first.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val prevMonthDays = Calendar.getInstance().apply {
-            clear(); timeInMillis = first.timeInMillis
-        }.let { c -> c.add(Calendar.DAY_OF_MONTH, -1); c.get(Calendar.DAY_OF_MONTH) }
-
+        // ---------- 日期网格（数据已预计算，纯绘制） ----------
         val gridTop = padV + titleH + weekH
         paint.textSize = sp(12.5f)
 
         for (index in 0 until ROWS * 7) {
             val col = index % 7
             val row = index / 7
-
-            val day: Int
-            val inMonth: Boolean
-            when {
-                index < firstWd -> {
-                    day = prevMonthDays - firstWd + index + 1
-                    inMonth = false
-                }
-                index < firstWd + days -> {
-                    day = index - firstWd + 1
-                    inMonth = true
-                }
-                else -> {
-                    day = index - firstWd - days + 1
-                    inMonth = false
-                }
-            }
-
             val cx = padH + cellW * (col + 0.5f)
             val cellCenterY = gridTop + row * rowH + rowH / 2f
-            val isToday = inMonth && year == todayY && month == todayM && day == todayD
 
-            if (isToday) {
+            if (index == todayIndex) {
                 paint.style = Paint.Style.FILL
                 paint.color = cPrimary
                 canvas.drawCircle(cx, cellCenterY, minOf(cellW, rowH) * 0.46f, paint)
                 paint.typeface = bold
                 paint.color = cOnPrimary
+                paint.alpha = 255
             } else {
                 paint.typeface = normal
-                if (inMonth) {
+                if (inMonth[index]) {
                     paint.color = cTextPrimary
                     paint.alpha = 255
                 } else {
@@ -162,15 +156,15 @@ class MiniMonthView @JvmOverloads constructor(
             }
 
             paint.textAlign = Paint.Align.CENTER
-            canvas.drawText(day.toString(), cx, baselineFor(cellCenterY), paint)
+            canvas.drawText(dayNumbers[index].toString(), cx, baselineFor(cellCenterY), paint)
 
             paint.alpha = 255                 // 恢复，避免影响后续绘制
         }
     }
 
-    /** 文字在给定中心线上垂直居中所需的 baseline。 */
+    /** 文字在给定中心线上垂直居中所需的 baseline（复用 FontMetrics，零分配）。 */
     private fun baselineFor(centerY: Float): Float {
-        val fm = paint.fontMetrics
+        paint.getFontMetrics(fm)
         return centerY - (fm.ascent + fm.descent) / 2f
     }
 

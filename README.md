@@ -36,6 +36,7 @@ Suntime/
     └── src/main/
         ├── AndroidManifest.xml
         ├── java/com/example/suntime/
+        │   ├── SuntimeApp.kt           # Application：启动时一次性应用主题
         │   ├── MainActivity.kt
         │   ├── TimerActivity.kt        # 计时器（倒计时）页面
         │   ├── StopwatchActivity.kt    # 秒表页面
@@ -53,17 +54,20 @@ Suntime/
         │   │   ├── CoordTransform.kt  # WGS-84↔GCJ-02↔BD-09 坐标转换
         │   │   ├── AddressResolver.kt # 多服务商逆地理（全球覆盖）
         │   │   ├── WindowSize.kt      # 窗口尺寸等级分类（Compact/Medium/Expanded）
-        │   │   └── ScreenInfo.kt      # 读取屏幕分辨率/DPI/密度，归类尺寸等级
+        │   │   ├── ScreenInfo.kt      # 读取屏幕分辨率/DPI/密度，归类尺寸等级
+        │   │   └── Motion.kt          # 动画开关（遵循系统动画时长缩放）
         │   ├── view/
         │   │   ├── CompassView.kt     # 自定义指南针 View
         │   │   └── MiniMonthView.kt   # 年视图迷你月历（单 View Canvas 绘制）
         │   └── adapter/
         │       ├── MainPagerAdapter.kt   # 四页 ViewPager2 分页（滑动切页）
         │       ├── WorldClockAdapter.kt
-        │       └── CalendarDayAdapter.kt
+        │       ├── CalendarDayAdapter.kt
+        │       └── CalendarYearAdapter.kt # 年视图 12 宫格构建
         └── res/
             ├── layout/ (activity_main / activity_timer / activity_stopwatch / fragment_clock / fragment_calendar / fragment_compass / fragment_settings / item_world_clock / item_calendar_day)
             ├── menu/ (bottom_nav_menu / clock_tools_menu)
+            ├── anim/ (fade_in / fade_out / slide_in_right / slide_out_right)
             ├── drawable/ (ic_clock / ic_calendar / ic_compass / ic_settings / ic_stopwatch / ic_launcher)
             └── values/ (strings / colors / themes)
 ```

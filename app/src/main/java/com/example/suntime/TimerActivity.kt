@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import com.example.suntime.databinding.ActivityTimerBinding
-import com.example.suntime.util.SettingsStore
 import java.util.Locale
 
 /**
@@ -21,11 +19,10 @@ class TimerActivity : AppCompatActivity() {
     private var remainingMs = 0L
     private var running = false
 
+    /** 上次显示的整秒，避免同一秒内重复 setText。 */
+    private var lastShownSec = -1L
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 与主界面保持一致：应用已保存的浅色/深色/跟随系统主题
-        AppCompatDelegate.setDefaultNightMode(
-            SettingsStore.toNightMode(SettingsStore.getThemeMode(this))
-        )
         super.onCreate(savedInstanceState)
         binding = ActivityTimerBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -55,11 +52,12 @@ class TimerActivity : AppCompatActivity() {
             return
         }
 
-        // 立即刷新，避免首 tick（200ms）前仍显示旧值
+        // 立即刷新，避免首个 tick（1s）前仍显示旧值
         updateDisplay(remainingMs)
 
         timer?.cancel()
-        timer = object : CountDownTimer(remainingMs, 200L) {
+        // 倒计时只显示到秒，200ms 刷新一次是 5 倍冗余的 UI 更新；改为 1s
+        timer = object : CountDownTimer(remainingMs, 1000L) {
             override fun onTick(msUntilFinished: Long) {
                 remainingMs = msUntilFinished
                 updateDisplay(msUntilFinished)
@@ -98,6 +96,8 @@ class TimerActivity : AppCompatActivity() {
     private fun updateDisplay(ms: Long) {
         // 向上取整，避免开始瞬间显示成少 1 秒
         val totalSec = (ms + 999L) / 1000L
+        if (totalSec == lastShownSec) return
+        lastShownSec = totalSec
         val h = totalSec / 3600L
         val m = (totalSec % 3600L) / 60L
         val s = totalSec % 60L
@@ -117,5 +117,12 @@ class TimerActivity : AppCompatActivity() {
         timer?.cancel()
         timer = null
         super.onDestroy()
+    }
+
+    /** 返回时使用与进入对称的轻量转场。 */
+    @Suppress("DEPRECATION")
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.fade_in, R.anim.slide_out_right)
     }
 }

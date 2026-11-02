@@ -1,5 +1,6 @@
 package com.example.suntime.fragment
 
+import android.app.ActivityOptions
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -14,7 +15,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.suntime.R
 import com.example.suntime.StopwatchActivity
 import com.example.suntime.TimerActivity
@@ -39,10 +39,16 @@ class ClockFragment : Fragment() {
     private val prefsName = "world_clock_fav"
 
     private val handler = Handler(Looper.getMainLooper())
+    private val searchHandler = Handler(Looper.getMainLooper())
     private lateinit var tick: Runnable
+    private var pendingSearch: Runnable? = null
 
     private val baseTimeFmt = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
+    private val resultFmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss E", Locale.CHINA)
     private val baseCal = Calendar.getInstance()
+
+    /** 日期文案变化很慢（每天一次），缓存后避免每秒 setText 触发布局。 */
+    private var lastDateText = ""
 
     private var dateA: Triple<Int, Int, Int>? = null
     private var dateB: Triple<Int, Int, Int>? = null
@@ -74,24 +80,22 @@ class ClockFragment : Fragment() {
         binding.rvWorldClock.layoutManager = GridLayoutManager(requireContext(), worldSpan)
         binding.rvWorldClock.adapter = adapter
         binding.rvWorldClock.addItemDecoration(LightDividerDecoration(requireContext()))
+        // 整表重绑时不播放条目动画，避免搜索/切页时多余闪烁
+        binding.rvWorldClock.itemAnimator = null
 
-        binding.etCitySearch.addTextChangedListener { adapter.setKeyword(it?.toString() ?: "") }
-
-        // 本地时间每秒刷新
-        tick = Runnable {
-            val now = Calendar.getInstance()
-            binding.tvLocalTime.text = String.format(
-                Locale.CHINA, "%02d:%02d:%02d",
-                now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
-            )
-            val w = arrayOf("日", "一", "二", "三", "四", "五", "六")[now.get(Calendar.DAY_OF_WEEK) - 1]
-            binding.tvLocalDate.text = String.format(
-                Locale.CHINA, "%d年%d月%d日 星期%s",
-                now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1, now.get(Calendar.DAY_OF_MONTH), w
-            )
-            handler.postDelayed(tick, 1000)
+        // 搜索防抖：逐字符 notifyDataSetChanged 会在 43 行整表重绑时造成输入卡顿
+        binding.etCitySearch.addTextChangedListener { text ->
+            pendingSearch?.let { searchHandler.removeCallbacks(it) }
+            val keyword = text?.toString() ?: ""
+            val runnable = Runnable { adapter.setKeyword(keyword) }
+            pendingSearch = runnable
+            searchHandler.postDelayed(runnable, 120L)
         }
-        handler.post(tick)
+
+        tick = Runnable {
+            updateTimeNow()
+            scheduleNextTick()
+        }
 
         // 基准时间选择
         updateBaseLabel()
@@ -110,17 +114,65 @@ class ClockFragment : Fragment() {
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.menu_timer -> {
-                        startActivity(Intent(requireContext(), TimerActivity::class.java))
+                        openTool(TimerActivity::class.java)
                         true
                     }
                     R.id.menu_stopwatch -> {
-                        startActivity(Intent(requireContext(), StopwatchActivity::class.java))
+                        openTool(StopwatchActivity::class.java)
                         true
                     }
                     else -> false
                 }
             }
             popup.show()
+        }
+    }
+
+    /** 二级页面统一使用轻量「右移 + 淡入」转场，避免系统默认的整屏滑动。 */
+    private fun openTool(target: Class<*>) {
+        val options = ActivityOptions.makeCustomAnimation(
+            requireContext(), R.anim.slide_in_right, R.anim.fade_out
+        ).toBundle()
+        startActivity(Intent(requireContext(), target), options)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 只在页面可见时秒级刷新，离屏页不再空转 Handler
+        updateTimeNow()
+        scheduleNextTick()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(tick)
+    }
+
+    /** 对齐到下一个整秒，避免 postDelayed(1000) 的累计漂移。 */
+    private fun scheduleNextTick() {
+        handler.removeCallbacks(tick)
+        val delay = 1000L - (System.currentTimeMillis() % 1000L)
+        handler.postDelayed(tick, delay)
+    }
+
+    private fun updateTimeNow() {
+        val now = Calendar.getInstance()
+        val time = String.format(
+            Locale.CHINA, "%02d:%02d:%02d",
+            now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND)
+        )
+        binding.tvLocalTime.text = time
+
+        val date = String.format(
+            Locale.CHINA, "%d年%d月%d日 星期%s",
+            now.get(Calendar.YEAR),
+            now.get(Calendar.MONTH) + 1,
+            now.get(Calendar.DAY_OF_MONTH),
+            WEEK_LABELS[now.get(Calendar.DAY_OF_WEEK) - 1]
+        )
+        if (date != lastDateText) {
+            lastDateText = date
+            binding.tvLocalDate.text = date
         }
     }
 
@@ -147,8 +199,7 @@ class ClockFragment : Fragment() {
         val sign = if (binding.rbAdd.isChecked) 1 else -1
         val totalMs = sign * ((days * 24 + hours) * 60 + mins) * 60 * 1000L
         val result = Calendar.getInstance().apply { timeInMillis = baseCal.timeInMillis + totalMs }
-        val fmt = SimpleDateFormat("yyyy-MM-dd HH:mm:ss E", Locale.CHINA)
-        binding.tvCalcResult.text = "结果：${fmt.format(result.time)}\n（距今基准 ${if (sign > 0) "+" else ""}${days}天${hours}时${mins}分）"
+        binding.tvCalcResult.text = "结果：${resultFmt.format(result.time)}\n（距今基准 ${if (sign > 0) "+" else ""}${days}天${hours}时${mins}分）"
     }
 
     private fun pickDate(onPick: (Int, Int, Int) -> Unit) {
@@ -168,7 +219,14 @@ class ClockFragment : Fragment() {
 
     override fun onDestroyView() {
         handler.removeCallbacks(tick)
+        pendingSearch?.let { searchHandler.removeCallbacks(it) }
+        pendingSearch = null
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        /** 提到常量，避免每秒 new 一个数组。 */
+        val WEEK_LABELS = arrayOf("日", "一", "二", "三", "四", "五", "六")
     }
 }

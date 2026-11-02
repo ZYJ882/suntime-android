@@ -34,11 +34,20 @@ object AddressResolver {
 
     private val handler = Handler(Looper.getMainLooper())
 
+    /**
+     * 单线程串行执行逆地理请求。
+     * 原实现每次 resolve 都 new Thread，定位持续回调时会反复创建/销毁线程；
+     * 这里复用一条守护线程，既省开销也天然避免并发请求堆积。
+     */
+    private val executor = java.util.concurrent.Executors.newSingleThreadExecutor { r ->
+        Thread(r, "address-resolver").apply { isDaemon = true }
+    }
+
     fun resolve(context: Context, latitude: Double, longitude: Double, callback: (AddressResult) -> Unit) {
-        Thread {
+        executor.execute {
             val result = doResolve(context, latitude, longitude)
             handler.post { callback(result) }
-        }.start()
+        }
     }
 
     private fun doResolve(context: Context, lat: Double, lng: Double): AddressResult {

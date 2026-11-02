@@ -20,6 +20,7 @@ import com.example.suntime.adapter.DayCell
 import com.example.suntime.databinding.FragmentCalendarBinding
 import com.example.suntime.util.DateCalc
 import com.example.suntime.util.LunarCalendar
+import com.example.suntime.util.Motion
 import java.util.Calendar
 
 class CalendarFragment : Fragment() {
@@ -42,6 +43,9 @@ class CalendarFragment : Fragment() {
     /** 已构建过年视图的年份；同一年切换视图不重建，避免重复构建造成卡顿。 */
     private var renderedYear = 0
 
+    /** 视图切换动画的延迟任务，连续点击时先取消，避免状态错乱。 */
+    private var pendingViewSwap: Runnable? = null
+
     private var dateC: Triple<Int, Int, Int>? = null
     private var dateD: Triple<Int, Int, Int>? = null
 
@@ -52,23 +56,32 @@ class CalendarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val now = Calendar.getInstance()
-        curYear = now.get(Calendar.YEAR); curMonth = now.get(Calendar.MONTH) + 1
-        selYear = curYear; selMonth = curMonth; selDay = now.get(Calendar.DAY_OF_MONTH)
 
-        dayAdapter = CalendarDayAdapter(mutableListOf()) { cell ->
+        // 恢复状态（进程被回收 / 页面重建后不重置到「今天」）
+        val now = Calendar.getInstance()
+        curYear = savedInstanceState?.getInt(KEY_YEAR, now.get(Calendar.YEAR)) ?: now.get(Calendar.YEAR)
+        curMonth = savedInstanceState?.getInt(KEY_MONTH, now.get(Calendar.MONTH) + 1) ?: (now.get(Calendar.MONTH) + 1)
+        selYear = savedInstanceState?.getInt(KEY_SEL_YEAR, curYear) ?: curYear
+        selMonth = savedInstanceState?.getInt(KEY_SEL_MONTH, curMonth) ?: curMonth
+        selDay = savedInstanceState?.getInt(KEY_SEL_DAY, now.get(Calendar.DAY_OF_MONTH)) ?: now.get(Calendar.DAY_OF_MONTH)
+        viewMode = savedInstanceState?.getString(KEY_VIEW)
+            ?.let { runCatching { CalView.valueOf(it) }.getOrNull() } ?: CalView.MONTH
+
+        dayAdapter = CalendarDayAdapter(requireContext(), mutableListOf()) { cell ->
             selYear = cell.year; selMonth = cell.month; selDay = cell.day
             renderMonth()
             updateDetail()
         }
         binding.rvCalendar.layoutManager = GridLayoutManager(requireContext(), 7)
         binding.rvCalendar.adapter = dayAdapter
+        binding.rvCalendar.itemAnimator = null
 
         binding.btnPrevMonth.setOnClickListener { addMonth(-1) }
         binding.btnNextMonth.setOnClickListener { addMonth(1) }
         binding.btnToday.setOnClickListener {
-            curYear = now.get(Calendar.YEAR); curMonth = now.get(Calendar.MONTH) + 1
-            selYear = curYear; selMonth = curMonth; selDay = now.get(Calendar.DAY_OF_MONTH)
+            val t = Calendar.getInstance()
+            curYear = t.get(Calendar.YEAR); curMonth = t.get(Calendar.MONTH) + 1
+            selYear = curYear; selMonth = curMonth; selDay = t.get(Calendar.DAY_OF_MONTH)
             renderMonth(); updateDetail()
         }
 
@@ -93,14 +106,24 @@ class CalendarFragment : Fragment() {
         setupViewSwitcher()
 
         renderMonth()
-        applyView()
+        applyView(animate = false)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_YEAR, curYear)
+        outState.putInt(KEY_MONTH, curMonth)
+        outState.putInt(KEY_SEL_YEAR, selYear)
+        outState.putInt(KEY_SEL_MONTH, selMonth)
+        outState.putInt(KEY_SEL_DAY, selDay)
+        outState.putString(KEY_VIEW, viewMode.name)
     }
 
     // ============ 年 / 月 / 日 视图切换 ============
     private fun setupViewSwitcher() {
-        binding.chipYear.setOnClickListener { viewMode = CalView.YEAR; applyView() }
-        binding.chipMonth.setOnClickListener { viewMode = CalView.MONTH; applyView() }
-        binding.chipDay.setOnClickListener { viewMode = CalView.DAY; applyView() }
+        binding.chipYear.setOnClickListener { switchMode(CalView.YEAR) }
+        binding.chipMonth.setOnClickListener { switchMode(CalView.MONTH) }
+        binding.chipDay.setOnClickListener { switchMode(CalView.DAY) }
 
         binding.btnPrevYear.setOnClickListener { curYear--; renderYear() }
         binding.btnNextYear.setOnClickListener { curYear++; renderYear() }
@@ -110,25 +133,97 @@ class CalendarFragment : Fragment() {
         binding.btnNextDay.setOnClickListener { addDay(1) }
     }
 
-    private fun applyView() {
+    private fun switchMode(mode: CalView) {
+        if (viewMode == mode) return
+        viewMode = mode
+        applyView(animate = true)
+    }
+
+    /**
+     * 应用当前视图模式。
+     *
+     * @param animate true 时使用「旧内容淡出 → 切换可见性 → 新内容淡入」的轻量转场。
+     *                只用 alpha/translationY，不触发布局动画；系统关闭动画时自动退化为瞬切。
+     */
+    private fun applyView(animate: Boolean = false) {
         val m = viewMode == CalView.MONTH
         val y = viewMode == CalView.YEAR
         val d = viewMode == CalView.DAY
-        binding.monthHeader.visibility = vis(m)
-        binding.monthContent.visibility = vis(m)
-        binding.yearHeader.visibility = vis(y)
-        binding.yearContent.visibility = vis(y)
-        binding.dayHeader.visibility = vis(d)
-        binding.detailPanel.visibility = vis(m || d)
+
+        // 先把内容准备好，再切换可见性，避免出现空白帧
+        when (viewMode) {
+            CalView.YEAR -> renderYear()
+            CalView.DAY -> { updateDetail(); renderDayTitle() }
+            CalView.MONTH -> updateDetail()
+        }
 
         styleChip(binding.chipYear, y)
         styleChip(binding.chipMonth, m)
         styleChip(binding.chipDay, d)
 
-        when (viewMode) {
-            CalView.YEAR -> renderYear()
-            CalView.DAY -> { updateDetail(); renderDayTitle() }
-            CalView.MONTH -> updateDetail()
+        val targets = arrayOf(
+            binding.monthHeader to m,
+            binding.monthContent to m,
+            binding.yearHeader to y,
+            binding.yearContent to y,
+            binding.dayHeader to d,
+            binding.detailPanel to (m || d)
+        )
+
+        // 取消上一次未完成的切换与所有在途动画，避免 alpha 停在中间值
+        pendingViewSwap?.let { binding.root.removeCallbacks(it) }
+        pendingViewSwap = null
+        for ((v, _) in targets) v.animate().cancel()
+
+        if (!animate || !Motion.animationsEnabled(requireContext())) {
+            for ((v, show) in targets) {
+                v.alpha = 1f
+                v.translationY = 0f
+                v.visibility = vis(show)
+            }
+            return
+        }
+
+        val toHide = targets.filter { !it.second && it.first.visibility == View.VISIBLE }.map { it.first }
+        val toShow = targets.filter {
+            it.second && (it.first.visibility != View.VISIBLE || it.first.alpha < 1f)
+        }.map { it.first }
+
+        if (toHide.isEmpty()) {
+            fadeIn(toShow)
+            return
+        }
+
+        for (v in toHide) {
+            v.animate().cancel()
+            v.animate().alpha(0f).setDuration(100L).start()
+        }
+
+        val swap = Runnable {
+            for (v in toHide) {
+                v.visibility = View.GONE
+                v.alpha = 1f
+                v.translationY = 0f
+            }
+            fadeIn(toShow)
+            pendingViewSwap = null
+        }
+        pendingViewSwap = swap
+        binding.root.postDelayed(swap, 100L)
+    }
+
+    private fun fadeIn(views: List<View>) {
+        if (views.isEmpty()) return
+        val offset = 6f * resources.displayMetrics.density
+        for (v in views) {
+            v.animate().cancel()
+            // 已经可见、只是上次淡出被打断的，从当前 alpha 继续回到 1，避免二次闪一下
+            if (v.visibility != View.VISIBLE) {
+                v.visibility = View.VISIBLE
+                v.alpha = 0f
+                v.translationY = offset
+            }
+            v.animate().alpha(1f).translationY(0f).setDuration(160L).start()
         }
     }
 
@@ -149,14 +244,20 @@ class CalendarFragment : Fragment() {
         if (renderedYear == curYear) return   // 同一年已构建，直接复用
         val columns = if (resources.configuration.screenWidthDp >= 840) 3 else 2
         CalendarYearAdapter.buildInto(binding.llYear, curYear, columns) { y, m ->
-            viewMode = CalView.MONTH
             curYear = y; curMonth = m; selYear = y; selMonth = m; selDay = 1
             binding.tvMonthTitle.text = String.format("%d年%d月", curYear, curMonth)
-            applyView()
+            viewMode = CalView.MONTH
             renderMonth()
-            updateDetail()
+            applyView(animate = true)
         }
         renderedYear = curYear
+
+        // 翻年时给 12 宫格一个很短的淡入，掩盖同步重建的瞬间
+        if (binding.yearContent.visibility == View.VISIBLE && Motion.animationsEnabled(requireContext())) {
+            binding.llYear.animate().cancel()
+            binding.llYear.alpha = 0.35f
+            binding.llYear.animate().alpha(1f).setDuration(140L).start()
+        }
     }
 
     private fun addDay(delta: Int) {
@@ -172,7 +273,7 @@ class CalendarFragment : Fragment() {
         binding.tvDayTitle.text = l.weekday
     }
 
-    // ============ 月视图（原有逻辑保留）============
+    // ============ 月视图 ============
     private fun addMonth(delta: Int) {
         var m = curMonth + delta
         var y = curYear
@@ -184,29 +285,36 @@ class CalendarFragment : Fragment() {
 
     private fun renderMonth() {
         binding.tvMonthTitle.text = String.format("%d年%d月", curYear, curMonth)
+
         val cal = Calendar.getInstance().apply { clear(); set(curYear, curMonth - 1, 1) }
         val firstWeekday = cal.get(Calendar.DAY_OF_WEEK) - 1  // 0=周日
         val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val today = Calendar.getInstance()
 
-        val list = mutableListOf<DayCell>()
-        // 上月补位
-        val prev = Calendar.getInstance().apply { clear(); set(curYear, curMonth - 1, 1); add(Calendar.DAY_OF_MONTH, -firstWeekday) }
-        for (i in 0 until firstWeekday) {
-            list.add(DayCell(prev.get(Calendar.YEAR), prev.get(Calendar.MONTH) + 1, prev.get(Calendar.DAY_OF_MONTH), false, false, false))
-            prev.add(Calendar.DAY_OF_MONTH, 1)
+        val today = Calendar.getInstance()
+        val todayY = today.get(Calendar.YEAR)
+        val todayM = today.get(Calendar.MONTH) + 1
+        val todayD = today.get(Calendar.DAY_OF_MONTH)
+
+        // 单个 Calendar 游标走完 42 格，避免原实现每个循环段各建一个 Calendar
+        val cursor = Calendar.getInstance().apply {
+            clear(); set(curYear, curMonth - 1, 1); add(Calendar.DAY_OF_MONTH, -firstWeekday)
         }
-        // 本月
-        for (d in 1..daysInMonth) {
-            val isToday = (curYear == today.get(Calendar.YEAR) && curMonth == today.get(Calendar.MONTH) + 1 && d == today.get(Calendar.DAY_OF_MONTH))
-            val isSel = (curYear == selYear && curMonth == selMonth && d == selDay)
-            list.add(DayCell(curYear, curMonth, d, true, isToday, isSel))
-        }
-        // 下月补位到 42
-        var next = Calendar.getInstance().apply { clear(); set(curYear, curMonth - 1, daysInMonth); add(Calendar.DAY_OF_MONTH, 1) }
-        while (list.size < 42) {
-            list.add(DayCell(next.get(Calendar.YEAR), next.get(Calendar.MONTH) + 1, next.get(Calendar.DAY_OF_MONTH), false, false, false))
-            next.add(Calendar.DAY_OF_MONTH, 1)
+
+        val list = ArrayList<DayCell>(42)
+        for (i in 0 until 42) {
+            val y = cursor.get(Calendar.YEAR)
+            val m = cursor.get(Calendar.MONTH) + 1
+            val d = cursor.get(Calendar.DAY_OF_MONTH)
+            val inMonth = i >= firstWeekday && i < firstWeekday + daysInMonth
+            list.add(
+                DayCell(
+                    y, m, d,
+                    inMonth = inMonth,
+                    isToday = inMonth && y == todayY && m == todayM && d == todayD,
+                    isSelected = inMonth && y == selYear && m == selMonth && d == selDay
+                )
+            )
+            cursor.add(Calendar.DAY_OF_MONTH, 1)
         }
         dayAdapter.update(list)
     }
@@ -254,7 +362,18 @@ class CalendarFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        pendingViewSwap?.let { binding.root.removeCallbacks(it) }
+        pendingViewSwap = null
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val KEY_YEAR = "cal_year"
+        const val KEY_MONTH = "cal_month"
+        const val KEY_SEL_YEAR = "cal_sel_year"
+        const val KEY_SEL_MONTH = "cal_sel_month"
+        const val KEY_SEL_DAY = "cal_sel_day"
+        const val KEY_VIEW = "cal_view"
     }
 }

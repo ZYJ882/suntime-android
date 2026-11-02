@@ -1,6 +1,7 @@
 package com.example.suntime.view
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
@@ -21,8 +22,13 @@ import kotlin.math.sin
  * - 刻度：每 2° 细刻度、每 10° 中刻度、每 30° 粗刻度并标注度数；
  * - 方位文字：N/E/S/W 加重（N 用暖红），NE/SE/SW/NW 弱化。
  *
- * 所有绘制尺寸均由 dp 换算为像素，不使用硬编码像素值，保证不同分辨率/DPI 下视觉一致。
- * 对外接口 [setAzimuth] 语义不变：传入的 deg 为「设备顶部朝向的方位角」。
+ * 性能设计（1.11.3）：
+ * 表盘（底色、圆环、180 根刻度、度数、方位文字、北向三角）是**静态内容**，
+ * 每次方位变化只是整体旋转。原实现每帧重新绘制约 200 条线/文字，传感器 50Hz 下
+ * 主线程压力很大。现在把静态表盘渲染进一张 [Bitmap] 缓存，onDraw 只做一次
+ * 「旋转画布 + 贴图」，单帧绘制成本从 ~200 次 draw 降到 1 次。
+ *
+ * 所有绘制尺寸均由 dp 换算为像素，不使用硬编码像素值。
  */
 class CompassView @JvmOverloads constructor(
     context: Context,
@@ -32,6 +38,8 @@ class CompassView @JvmOverloads constructor(
 
     private var azimuth = 0f
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.SUBPIXEL_TEXT_FLAG)
+    /** 旋转贴图时开启双线性过滤，避免表盘刻度出现锯齿。 */
+    private val bitmapPaint = Paint(Paint.FILTER_BITMAP_FLAG or Paint.ANTI_ALIAS_FLAG)
     private val path = Path()
 
     private val density: Float = context.resources.displayMetrics.density
@@ -51,11 +59,49 @@ class CompassView @JvmOverloads constructor(
     private val bold = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     private val normal = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
 
+    // ---------- 静态表盘位图缓存 ----------
+    private var dial: Bitmap? = null
+    private var dialW = 0
+    private var dialH = 0
+
     fun setAzimuth(deg: Float) {
         val d = ((deg % 360f) + 360f) % 360f
         if (d == azimuth) return
         azimuth = d
         invalidate()
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w != oldw || h != oldh) recycleDial()
+    }
+
+    override fun onDetachedFromWindow() {
+        recycleDial()
+        super.onDetachedFromWindow()
+    }
+
+    private fun recycleDial() {
+        dial?.recycle()
+        dial = null
+        dialW = 0
+        dialH = 0
+    }
+
+    /** 尺寸变化时重建静态表盘位图；正常帧直接复用。 */
+    private fun ensureDial(): Bitmap? {
+        val w = width
+        val h = height
+        if (w <= 0 || h <= 0) return null
+        dial?.let { if (dialW == w && dialH == h) return it }
+
+        recycleDial()
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        drawDial(Canvas(bmp), w / 2f, h / 2f, min(w, h) / 2f - dp(2f))
+        dial = bmp
+        dialW = w
+        dialH = h
+        return bmp
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -65,14 +111,52 @@ class CompassView @JvmOverloads constructor(
         val r = min(width, height) / 2f - dp(2f)
         if (r <= dp(8f)) return
 
-        // 1. 表盘底色（浅色/深色自适应，圆形本身不参与旋转）
+        // 静态表盘整体反向旋转：N 始终指向真北
+        val bmp = ensureDial() ?: return
+        canvas.save()
+        canvas.rotate(-azimuth, cx, cy)
+        canvas.drawBitmap(bmp, 0f, 0f, bitmapPaint)
+        canvas.restore()
+
+        // 8. 顶部固定指针：代表「手机正面朝向」，读数以它对准的表盘刻度为准
+        paint.style = Paint.Style.FILL
+        paint.color = cNeedleN
+        path.reset()
+        val tipY = cy - r + dp(1f)
+        val baseY = cy - r + dp(12f)
+        val halfW = dp(5f)
+        path.moveTo(cx, tipY)
+        path.lineTo(cx - halfW, baseY)
+        path.lineTo(cx + halfW, baseY)
+        path.close()
+        canvas.drawPath(path, paint)
+
+        // 指针延长细线，强化「指向中心」的视觉引导
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = dp(1.2f)
+        paint.color = cCenterRing
+        canvas.drawLine(cx, baseY, cx, cy - r * 0.70f, paint)
+
+        // 9. 中心圆：填充 + 淡内圈 + 主色外环（固定，不随表盘旋转）
+        val centerR = r * 0.055f
+        paint.style = Paint.Style.FILL
+        paint.color = cCenter
+        canvas.drawCircle(cx, cy, centerR, paint)
+        paint.color = cNeedleS
+        canvas.drawCircle(cx, cy, centerR * 0.32f, paint)
+
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = dp(1.4f)
+        paint.color = cCenterRing
+        canvas.drawCircle(cx, cy, centerR, paint)
+    }
+
+    /** 绘制一次静态表盘：底色 + 圆环 + 刻度 + 度数 + 方位文字 + 北向三角。 */
+    private fun drawDial(canvas: Canvas, cx: Float, cy: Float, r: Float) {
+        // 1. 表盘底色
         paint.style = Paint.Style.FILL
         paint.color = cDial
         canvas.drawCircle(cx, cy, r, paint)
-
-        // ===== 以下全部随方位旋转：表盘指向真实地理方向 =====
-        canvas.save()
-        canvas.rotate(-azimuth, cx, cy)
 
         // 2. 外圈细环 + 内侧淡环
         paint.style = Paint.Style.STROKE
@@ -152,58 +236,17 @@ class CompassView @JvmOverloads constructor(
         }
 
         // 7. 北向指示：N 外侧的小三角（随表盘旋转，始终指向真北）
-        val radN = 0.0
         val nOuter = r - dp(6f)
         val nInner = r - dp(14f)
         val nHalf = dp(3.6f)
         paint.style = Paint.Style.FILL
         paint.color = cNeedleN
         path.reset()
-        path.moveTo(cx + nInner * sin(radN).toFloat(), cy - nInner * cos(radN).toFloat())
-        path.lineTo(
-            cx + nOuter * sin(radN).toFloat() - nHalf,
-            cy - nOuter * cos(radN).toFloat()
-        )
-        path.lineTo(
-            cx + nOuter * sin(radN).toFloat() + nHalf,
-            cy - nOuter * cos(radN).toFloat()
-        )
+        path.moveTo(cx, cy - nInner)
+        path.lineTo(cx - nHalf, cy - nOuter)
+        path.lineTo(cx + nHalf, cy - nOuter)
         path.close()
         canvas.drawPath(path, paint)
-
-        canvas.restore()
-
-        // 8. 顶部固定指针：代表「手机正面朝向」，读数以它对准的表盘刻度为准
-        paint.style = Paint.Style.FILL
-        paint.color = cNeedleN
-        path.reset()
-        val tipY = cy - r + dp(1f)
-        val baseY = cy - r + dp(12f)
-        val halfW = dp(5f)
-        path.moveTo(cx, tipY)
-        path.lineTo(cx - halfW, baseY)
-        path.lineTo(cx + halfW, baseY)
-        path.close()
-        canvas.drawPath(path, paint)
-
-        // 指针延长细线，强化「指向中心」的视觉引导
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = dp(1.2f)
-        paint.color = cCenterRing
-        canvas.drawLine(cx, baseY, cx, cy - r * 0.70f, paint)
-
-        // 9. 中心圆：填充 + 淡内圈 + 主色外环
-        val centerR = r * 0.055f
-        paint.style = Paint.Style.FILL
-        paint.color = cCenter
-        canvas.drawCircle(cx, cy, centerR, paint)
-        paint.color = cNeedleS
-        canvas.drawCircle(cx, cy, centerR * 0.32f, paint)
-
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = dp(1.4f)
-        paint.color = cCenterRing
-        canvas.drawCircle(cx, cy, centerR, paint)
     }
 
     private companion object {

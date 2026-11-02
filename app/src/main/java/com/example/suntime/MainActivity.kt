@@ -2,11 +2,11 @@ package com.example.suntime
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.viewpager2.widget.ViewPager2
 import com.example.suntime.adapter.MainPagerAdapter
 import com.example.suntime.databinding.ActivityMainBinding
-import com.example.suntime.util.SettingsStore
+import com.example.suntime.util.Motion
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,23 +24,22 @@ class MainActivity : AppCompatActivity() {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 在 setContentView 之前应用已保存的主题，避免闪烁
-        AppCompatDelegate.setDefaultNightMode(
-            SettingsStore.toNightMode(SettingsStore.getThemeMode(this))
-        )
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 冷启动关键优化：只保留当前页 + 相邻 1 页。
+        // 原实现 offscreenPageLimit = 3 会在首帧同步创建全部 4 个 Fragment
+        //（时钟 43 行世界时钟 + 日历 42 格 + 指南针 + 设置整页表单），
+        // 显著拖慢首屏。改为 1 后首帧只需准备时钟页与日历页。
+        binding.viewPager.offscreenPageLimit = 1
         binding.viewPager.adapter = MainPagerAdapter(this)
-        // 预加载全部页面，左右滑动时页面状态（滚动位置 / 选中日等）不丢失
-        binding.viewPager.offscreenPageLimit = 3
 
         // 点击底部导航 → 切到对应页
         binding.bottomNav.setOnItemSelectedListener { item ->
             val index = navIds.indexOf(item.itemId)
             if (index >= 0) {
-                if (!syncingNav) binding.viewPager.setCurrentItem(index, true)
+                if (!syncingNav) switchPage(index)
                 true
             } else {
                 false
@@ -56,12 +55,46 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        if (savedInstanceState == null) {
-            binding.viewPager.setCurrentItem(0, false)
-        }
-        // 恢复 / 首次进入时，让底部导航与当前页一致
+        // 让底部导航与当前页一致（含 Activity 重建后的恢复）
         syncingNav = true
         binding.bottomNav.selectedItemId = navIds[binding.viewPager.currentItem]
         syncingNav = false
+    }
+
+    /**
+     * 导航切页：
+     * - 相邻页保留滑动动画，方向感自然；
+     * - 跨页跳转（如时钟 → 设置）不依次滚过中间页：那会触发中间页创建并产生很长的位移动画。
+     *   改为「快速淡出 → 瞬切 → 淡入」，既快又避免无谓的 Fragment 生命周期开销。
+     */
+    private fun switchPage(index: Int) {
+        val current = binding.viewPager.currentItem
+        if (index == current) return
+
+        // 终止上一次未完成的淡入淡出，避免 alpha 停在中间值
+        binding.viewPager.animate().cancel()
+        binding.viewPager.alpha = 1f
+
+        if (abs(index - current) <= 1) {
+            binding.viewPager.setCurrentItem(index, true)
+            return
+        }
+
+        if (!Motion.animationsEnabled(this)) {
+            binding.viewPager.setCurrentItem(index, false)
+            return
+        }
+
+        binding.viewPager.animate()
+            .alpha(0f)
+            .setDuration(90L)
+            .withEndAction {
+                binding.viewPager.setCurrentItem(index, false)
+                binding.viewPager.animate()
+                    .alpha(1f)
+                    .setDuration(160L)
+                    .start()
+            }
+            .start()
     }
 }

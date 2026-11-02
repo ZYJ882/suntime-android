@@ -57,6 +57,23 @@ object LunarCalendar {
         440795, 462224, 483532, 504758
     )
 
+    /**
+     * 农历结果缓存（LRU，最多 1024 天）。
+     *
+     * 月视图一次要换算 42 个日期，翻月、选中日期、切回月视图都会重复计算同一批日期。
+     * 缓存命中后可直接跳过「1900 年起逐年/逐月累加」的循环。
+     */
+    private val lunarCache = object : LinkedHashMap<Long, Lunar>(256, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, Lunar>?): Boolean =
+            size > 1024
+    }
+
+    /** 节气日期缓存：每年 24 个，避免重复构造 Calendar / 查 TimeZone。 */
+    private val termDayCache = HashMap<Long, Int>()
+
+    private fun dayKey(y: Int, m: Int, d: Int): Long =
+        (y.toLong() shl 16) or (m.toLong() shl 8) or d.toLong()
+
     // ---------- 农历内部计算 ----------
     private fun lYearDays(y: Int): Int {
         var sum = 348
@@ -81,11 +98,16 @@ object LunarCalendar {
 
     // 节气所在日期（日，1-31）
     private fun getTermDay(y: Int, n: Int): Int {
+        val key = y.toLong() * 32L + n
+        termDayCache[key]?.let { return it }
+
         val base = Date.UTC(1900, 0, 6, 2, 5, 0)
         val ms = (31556925974.7 * (y - 1900) + sTermInfo[n] * 60000 + base).toLong()
         val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         cal.timeInMillis = ms
-        return cal.get(Calendar.DAY_OF_MONTH)
+        val day = cal.get(Calendar.DAY_OF_MONTH)
+        termDayCache[key] = day
+        return day
     }
 
     fun getSolarTerm(y: Int, m: Int, d: Int): String? {
@@ -125,6 +147,14 @@ object LunarCalendar {
     )
 
     fun solarToLunar(year: Int, month: Int, day: Int): Lunar {
+        val key = dayKey(year, month, day)
+        lunarCache[key]?.let { return it }
+        val result = computeLunar(year, month, day)
+        lunarCache[key] = result
+        return result
+    }
+
+    private fun computeLunar(year: Int, month: Int, day: Int): Lunar {
         val base = Calendar.getInstance().apply {
             clear(); set(1900, 0, 31, 0, 0, 0); set(Calendar.MILLISECOND, 0)
         }

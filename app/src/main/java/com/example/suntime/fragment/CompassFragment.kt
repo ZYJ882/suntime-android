@@ -60,6 +60,10 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
     private var azimuth = 0f
     private var lastShown = -1f
     private var lastAccuracy = -1
+    private var lastDirText = ""
+
+    /** 屏幕旋转只需在页面可见时读一次，避免每个传感器事件都查询 WindowManager。 */
+    private var screenRotation = Surface.ROTATION_0
 
     private lateinit var locationManager: LocationManager
 
@@ -94,6 +98,8 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
         haveAccel = false
         haveMagnet = false
         lastShown = -1f
+        lastDirText = ""
+        screenRotation = readDisplayRotation()
 
         if (useFused) {
             rotationVector?.let {
@@ -188,17 +194,18 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
      * 否则横屏握持时读数会整体偏移 90°。
      */
     @Suppress("DEPRECATION")
-    private fun remapForScreenRotation(src: FloatArray, dst: FloatArray): Boolean {
-        val rotation = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                (activity?.display ?: requireActivity().windowManager.defaultDisplay).rotation
-            } else {
-                requireActivity().windowManager.defaultDisplay.rotation
-            }
-        } catch (_: Exception) {
-            Surface.ROTATION_0
+    private fun readDisplayRotation(): Int = try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            (activity?.display ?: requireActivity().windowManager.defaultDisplay).rotation
+        } else {
+            requireActivity().windowManager.defaultDisplay.rotation
         }
-        return when (rotation) {
+    } catch (_: Exception) {
+        Surface.ROTATION_0
+    }
+
+    private fun remapForScreenRotation(src: FloatArray, dst: FloatArray): Boolean {
+        return when (screenRotation) {
             Surface.ROTATION_90 -> {
                 SensorManager.remapCoordinateSystem(
                     src, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, dst
@@ -249,7 +256,11 @@ class CompassFragment : Fragment(), SensorEventListener, LocationListener {
 
         val idx = (((trueAzimuth + 22.5f) % 360f) / 45f).toInt() % 8
         val hint = if (magAccuracy <= SensorManager.SENSOR_STATUS_ACCURACY_LOW) " · 需校准" else ""
-        binding.tvHeadingDir.text = "${dirs[idx]}  ${dirsEn[idx]}$hint"
+        val dirText = "${dirs[idx]}  ${dirsEn[idx]}$hint"
+        if (dirText != lastDirText) {
+            lastDirText = dirText
+            binding.tvHeadingDir.text = dirText
+        }
     }
 
     private fun shortestDelta(a: Float, b: Float): Float {
