@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/bg_group"
     android:orientation="vertical"
-    android:padding="@dimen/space_12">
+    android:padding="@dimen/space_8">
 
     <TextView
         android:id="@+id/tvMiniMonth"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:includeFontPadding="false"
         android:textColor="@color/text_primary"
-        android:textSize="@dimen/text_subtitle"
+        android:textSize="@dimen/text_body_lg"
         android:textStyle="bold" />
 
     <!-- 星期表头（7 列） -->
@@ -22,16 +22,16 @@
         android:layout_marginTop="@dimen/space_4"
         android:orientation="horizontal">
 
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_micro" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="@color/text_tertiary" android:textSize="@dimen/text_week" />
     </LinearLayout>
 
-    <!-- 42 格迷你月历：由 CalendarYearAdapter 程序化填充 -->
+    <!-- 42 格迷你月历（每格单行公历数字）：由 CalendarYearAdapter 程序化填充 -->
     <GridLayout
         android:id="@+id/gridMini"
         android:layout_width="match_parent"

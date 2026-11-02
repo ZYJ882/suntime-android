@@ -39,6 +39,9 @@ class CalendarFragment : Fragment() {
 
     private lateinit var dayAdapter: CalendarDayAdapter
 
+    /** 已构建过年视图的年份；同一年切换视图不重建，避免重复构建造成卡顿。 */
+    private var renderedYear = 0
+
     private var dateC: Triple<Int, Int, Int>? = null
     private var dateD: Triple<Int, Int, Int>? = null
 
@@ -143,7 +146,9 @@ class CalendarFragment : Fragment() {
 
     private fun renderYear() {
         binding.tvYearTitle.text = String.format("%d年", curYear)
-        CalendarYearAdapter.buildInto(binding.llYear, curYear) { y, m ->
+        if (renderedYear == curYear) return   // 同一年已构建，直接复用
+        val columns = if (resources.configuration.screenWidthDp >= 840) 3 else 2
+        CalendarYearAdapter.buildInto(binding.llYear, curYear, columns) { y, m ->
             viewMode = CalView.MONTH
             curYear = y; curMonth = m; selYear = y; selMonth = m; selDay = 1
             binding.tvMonthTitle.text = String.format("%d年%d月", curYear, curMonth)
@@ -151,6 +156,7 @@ class CalendarFragment : Fragment() {
             renderMonth()
             updateDetail()
         }
+        renderedYear = curYear
     }
 
     private fun addDay(delta: Int) {

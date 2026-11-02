@@ -230,11 +230,12 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-                    <LinearLayout
+                    <!-- 年视图：3 列宫格（平板） -->
+                    <GridLayout
                         android:id="@+id/llYear"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
+                        android:columnCount="3" />
                 </LinearLayout>
             </LinearLayout>
 
