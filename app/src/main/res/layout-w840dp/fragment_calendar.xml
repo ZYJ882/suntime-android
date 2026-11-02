@@ -230,12 +230,12 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
-                    <!-- 年视图：3 列宫格（平板） -->
-                    <GridLayout
+                    <!-- 年视图容器：CalendarYearAdapter 按列逐行填充迷你月历 -->
+                    <LinearLayout
                         android:id="@+id/llYear"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:columnCount="3" />
+                        android:orientation="vertical" />
                 </LinearLayout>
             </LinearLayout>
 

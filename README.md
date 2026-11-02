@@ -55,7 +55,8 @@ Suntime/
         │   │   ├── WindowSize.kt      # 窗口尺寸等级分类（Compact/Medium/Expanded）
         │   │   └── ScreenInfo.kt      # 读取屏幕分辨率/DPI/密度，归类尺寸等级
         │   ├── view/
-        │   │   └── CompassView.kt     # 自定义指南针 View
+        │   │   ├── CompassView.kt     # 自定义指南针 View
+        │   │   └── MiniMonthView.kt   # 年视图迷你月历（单 View Canvas 绘制）
         │   └── adapter/
         │       ├── MainPagerAdapter.kt   # 四页 ViewPager2 分页（滑动切页）
         │       ├── WorldClockAdapter.kt

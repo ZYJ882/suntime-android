@@ -263,12 +263,12 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <!-- 年视图：2 列宫格（手机）；由 CalendarYearAdapter 程序化填充 -->
-            <GridLayout
+            <!-- 年视图容器：CalendarYearAdapter 按列逐行填充迷你月历 -->
+            <LinearLayout
                 android:id="@+id/llYear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="2" />
+                android:orientation="vertical" />
         </LinearLayout>
 
         <!-- ============ 选中日期详情（月/日视图可见）============ -->
